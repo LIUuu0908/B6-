@@ -1,0 +1,2095 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>晒场 SUN FIELD — 档案</title>
+<style>
+/* ── 设计令牌：瑞士国际主义 × 水泥地 / 深色版（__THEMENAME__） ── */
+:root{
+  --bg:#FFFFFF;
+  --ink:#3B3833;
+  --sub:#8A867E;
+  --line:#D9D5CC;
+  --panel:rgba(255,255,255,.78);
+  --accent:#8C614E;
+  --accent2:#B4642F;
+  --cat-chang:#AE7962;
+  --cat-wu:#D5C096;
+  --cat-ren:#CB9590;
+  --sh:rgba(90,86,80,.4);
+  --glow:rgba(255,255,255,.35);
+  --concrete:url("assets/concrete.jpg");
+  --font-en:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --font-cn:"方正兰亭黑","FZLanTingHei","FZLanTingHei-EL","FZLanTingHeiS-EL","FZLanTingHeiS","Noto Sans SC","Source Han Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+body.dark{
+  --bg:#3A2A22;
+  --ink:#F2E3B6;
+  --sub:#B9A88A;
+  --line:rgba(242,227,182,.3);
+  --panel:rgba(42,30,24,.72);
+  --accent:#C4692F;
+  --accent2:#D9A05B;
+  --cat-chang:#C58A5C;
+  --cat-wu:#D3B478;
+  --cat-ren:#C98F7E;
+  --sh:rgba(16,10,6,.6);
+  --glow:rgba(255,190,120,.12);
+  --concrete:url("assets/concrete_dark.jpg");
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  font-family:var(--font-en),var(--font-cn);font-weight:300;
+  color:var(--ink);background:#C9C7C1;
+  cursor:default;-webkit-font-smoothing:antialiased;
+}
+body.dark{background:#241A14}
+::selection{background:var(--accent);color:#fff}
+button{font-family:inherit;color:inherit;background:none;border:none;cursor:pointer;font-weight:300}
+:focus-visible{outline:1.5px solid var(--accent);outline-offset:3px}
+
+/* ── 水泥地背景 + 时间色罩 + 光晕 ── */
+#concrete{position:fixed;inset:0;z-index:0;background:var(--concrete) center/cover no-repeat}
+#tint{position:fixed;inset:0;z-index:1;pointer-events:none;background:#FFFDF7;mix-blend-mode:multiply;opacity:.3;transition:background .6s ease,opacity .6s ease}
+#glow{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(600px circle at var(--mx,70vw) var(--my,20vh),var(--glow),rgba(255,255,255,0) 100%)}
+
+/* ── 顶部导航：无边界融合进画布 ── */
+header{position:fixed;top:0;left:0;right:0;z-index:80;display:flex;justify-content:space-between;align-items:center;
+  padding:16px 3.2vw 12px;pointer-events:none}
+header>*{pointer-events:auto}
+.brand{display:flex;align-items:center;gap:14px}
+.brand .chip{font-family:var(--font-cn);font-size:13px;letter-spacing:.14em;padding:5px 14px;border:1.5px solid var(--ink);border-radius:999px;background:transparent}
+.brand h1{font-family:var(--font-en);font-weight:700;font-size:30px;letter-spacing:.02em;line-height:1}
+nav{display:flex;align-items:center;gap:10px}
+.pill{font-family:var(--font-cn);font-size:14px;letter-spacing:.12em;padding:6px 18px;border:1.5px solid var(--ink);border-radius:999px;transition:background .2s,color .2s;background:transparent}
+.pill:hover{background:var(--ink);color:#fff}
+.pill.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.pill.btnmenu{font-family:var(--font-en);font-weight:700;letter-spacing:0;font-size:16px;padding:4px 12px}
+.zoom{display:flex;align-items:center;gap:6px;margin-left:10px;font-family:var(--font-en);font-size:11px;letter-spacing:.08em;color:var(--sub)}
+.zoom button{width:26px;height:26px;border:1.5px solid var(--ink);font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;color:var(--ink);transition:.15s;background:transparent}
+.zoom button:hover{background:var(--ink);color:var(--bg)}
+.zoom b{min-width:40px;text-align:center;font-weight:400}
+#catdrop{position:absolute;top:calc(100% + 6px);right:3.2vw;z-index:90;display:none;flex-direction:column;
+  background:var(--panel);backdrop-filter:blur(10px);border:1px solid var(--line);padding:6px;min-width:170px}
+#catdrop.on{display:flex}
+#catdrop button{text-align:left;font-size:14px;letter-spacing:.12em;padding:9px 14px;transition:.15s}
+#catdrop button:hover{background:var(--cat-wu)}
+#catdrop button.on{background:var(--accent);color:#fff}
+
+/* ── 农具架：全高通栏悬浮条，悬浮向左拉出木质架 ── */
+#tooldock{position:fixed;left:0;top:0;bottom:0;z-index:70;display:flex;align-items:stretch}
+#toolstrip{width:26px;height:100%;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;z-index:2;
+  background:var(--panel);border-right:1px solid var(--line);transition:background .2s}
+#toolstrip span{writing-mode:vertical-rl;font-family:var(--font-cn);font-size:10.5px;letter-spacing:.42em;color:var(--ink);transition:color .2s}
+#toolstrip:hover{background:var(--cat-wu)}
+#toolstrip:hover span{color:var(--ink)}
+#toolstrip.att span{animation:stripPulse 1.6s ease-in-out 3}
+@keyframes stripPulse{50%{color:var(--accent)}}
+#tools{display:flex;flex-direction:column;gap:0;padding:0;margin-left:0;height:100%;justify-content:center;
+  transform:translateX(calc(-100% - 32px));transition:transform .38s var(--ease);
+  background:linear-gradient(180deg,#CFB589 0%,#C7AC79 50%,#C1A26E 100%);
+  border-right:1px solid rgba(59,56,51,.35)}
+body.dark #tools{background:linear-gradient(180deg,#5A4632 0%,#4E3C2A 50%,#463525 100%)}
+#tooldock:hover #tools,#tools.pin{transform:none}
+#tools.retract{transform:translateX(calc(-100% - 32px))!important}
+.tool{display:flex;flex-direction:column;align-items:center;gap:4px;padding:13px 10px;min-width:64px;position:relative;transition:.18s;
+  border-bottom:1px solid rgba(59,56,51,.22)}
+.tool:last-child{border-bottom:none}
+.tool svg{width:28px;height:28px;stroke:#3B3833;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;transition:stroke .18s,transform .18s}
+body.dark .tool svg{stroke:#F2E3B6}
+.tool .cn{font-family:var(--font-cn);font-size:11px;letter-spacing:.1em;color:rgba(59,56,51,.72);transition:color .18s}
+body.dark .tool .cn{color:rgba(242,227,182,.72)}
+.tool:hover{background:rgba(255,253,247,.28)}
+body.dark .tool:hover{background:rgba(255,255,255,.06)}
+.tool:hover svg{transform:translateY(-2px)}
+.tool.on svg{stroke:var(--accent2)}
+.tool.on .cn{color:var(--accent2)}
+.tool.on::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:4px;height:22px;background:var(--accent2)}
+
+/* ── 标签筛选：带底面板，不与画布图像混 ── */
+#tagpanel{position:fixed;left:104px;top:50%;transform:translateY(-50%);z-index:69;
+  display:none;flex-direction:column;min-width:210px;max-height:70vh;
+  background:var(--bg);border:1px solid var(--line);box-shadow:6px 7px 0 var(--sh);padding:6px 0}
+#tagpanel.on{display:flex}
+#tagpanel .tphead{font-family:var(--font-en);font-size:10px;letter-spacing:.3em;color:var(--sub);padding:4px 16px 8px;border-bottom:1px solid var(--line)}
+#taglist{overflow-y:auto;display:flex;flex-direction:column;scrollbar-width:none}
+#taglist::-webkit-scrollbar{display:none}
+.tagopt{display:flex;align-items:center;gap:10px;text-align:left;font-size:13px;padding:8px 16px;transition:.15s}
+.tagopt:hover{color:var(--accent)}
+.tagopt .box{width:11px;height:11px;border:1.5px solid var(--ink);flex:none;transition:.15s}
+.tagopt.on .box{background:var(--accent);border-color:var(--accent)}
+.tagopt .n{margin-left:auto;font-family:var(--font-en);font-size:10px;color:var(--sub)}
+#tagclear{font-family:var(--font-cn);font-size:12px;letter-spacing:.14em;padding:10px 16px;color:var(--sub);text-align:left}
+#tagclear:hover{color:var(--accent)}
+
+/* ── 首页：可拖拽探索的无边界画布 ── */
+#scroll{position:fixed;inset:0;z-index:10;overflow-y:auto;overflow-x:auto;scrollbar-width:none;cursor:grab;overflow-anchor:none}
+/* overflow-anchor:none —— 绳区下推图像时禁止浏览器滚动锚定回拉，修复"下面滑动不了" */
+#scroll::-webkit-scrollbar{display:none}
+#scroll.panning{cursor:grabbing}
+/* board 尺寸见文件末尾「自适应画布」统一规则 */
+.obj{position:absolute;touch-action:none;user-select:none;cursor:pointer;transition:opacity .4s ease;
+  transform:rotate(var(--rot,0deg)) scale(var(--sc,1));transform-origin:50% 55%}
+.obj .inner{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .7s var(--ease)}
+.obj.flip .inner{transform:rotateY(180deg)}
+.obj .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.obj .face img{width:100%;height:100%;display:block;pointer-events:none;object-fit:contain;
+  filter:drop-shadow(var(--sx,6px) var(--sy,6px) 0 var(--sh));transition:filter .3s ease}
+.obj .face.back{transform:rotateY(180deg);background:var(--bg);border:1px solid var(--line);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8%}
+.obj .face.back img{max-height:78%;filter:none}
+.obj .face.back span{font-family:var(--font-cn);font-size:10px;letter-spacing:.08em;color:var(--sub);
+  margin-top:6px;text-align:center;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.obj:hover{--sc:1.05}
+.obj.pressed{--sc:1.07}
+.obj.anim{transition:left .9s var(--ease),top .9s var(--ease),opacity .4s ease,transform .9s var(--ease)}
+.obj.drag{z-index:60!important;cursor:grabbing}
+.obj.drag:hover,.obj.drag.pressed{--sc:1}
+.obj.dim{opacity:.13;pointer-events:none;filter:grayscale(1)}
+.obj.dim img{filter:grayscale(1)}
+.obj.bursting{opacity:0;transition:opacity .35s ease}
+/* 谷堆里的物件：微微叠加的堆积感 */
+.obj.pile{z-index:20}
+/* 晾绳 */
+.hangline{position:absolute;left:0;right:0;height:0;border-top:1.5px solid var(--ink);opacity:.55;pointer-events:none;z-index:15}
+.hangline::before,.hangline::after{content:'';position:absolute;top:-4px;width:7px;height:7px;background:var(--ink)}
+.hangline::before{left:6px}.hangline::after{right:6px}
+.obj.hung{z-index:18}
+.obj.hung .inner{animation:sway 3.6s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-2.8deg)}50%{transform:rotate(2.8deg)}}
+/* 颗粒散开画布 */
+#burst{position:fixed;inset:0;z-index:150;pointer-events:none}
+
+/* ── 自定义农具光标（完全替换系统鼠标） ── */
+#cur{position:fixed;z-index:120;width:40px;height:40px;pointer-events:none;display:none;transform:translate(-8px,-34px)}
+#cur.on{display:block}
+#cur svg{width:100%;height:100%;stroke:var(--ink);fill:none;stroke-width:1.6;stroke-linecap:round}
+body.toolmode,body.toolmode *{cursor:none!important}
+
+/* ── 清除效果（扫把）：左下角，一键扫掉画布上所有农具效果，回到初始平铺 ── */
+#clearfx{position:fixed;left:34px;bottom:22px;z-index:75;display:flex;align-items:center;gap:7px;
+  padding:9px 14px;background:var(--panel);border:1px solid var(--line);box-shadow:4px 5px 0 var(--sh);
+  transition:transform .15s var(--ease),background .15s}
+#clearfx:hover{transform:translateY(-2px);background:var(--bg)}
+#clearfx:active{transform:translateY(1px)}
+#clearfx svg{width:20px;height:20px;stroke:var(--ink);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+#clearfx span{font-family:var(--font-cn);font-size:12px;letter-spacing:.2em;color:var(--ink)}
+#clearfx.sweep svg{animation:sweepbroom .5s var(--ease)}
+@keyframes sweepbroom{30%{transform:rotate(-14deg) translateX(-2px)}65%{transform:rotate(9deg) translateX(2px)}}
+body.incat #clearfx{display:none}
+
+/* ── 分类视图（图三：左栏 + 右图论点） ── */
+#catview{position:fixed;inset:0;z-index:10;display:none;padding-top:64px}
+#catview.on{display:block}
+#rail{position:absolute;left:0;top:64px;bottom:0;width:96px;border-right:1px solid var(--line);
+  display:flex;flex-direction:column;background:var(--panel);backdrop-filter:blur(6px)}
+#railhead{padding:12px 10px;border-bottom:1px solid var(--line)}
+#railhead b{font-family:var(--font-cn);font-weight:700;font-size:17px;display:block}
+#railhead span{font-family:var(--font-en);font-size:9px;letter-spacing:.24em;color:var(--sub)}
+#raillist{flex:1;overflow-y:auto;display:flex;flex-direction:column;scrollbar-width:thin}
+.railitem{position:relative;display:flex;align-items:center;justify-content:center;height:82px;border-bottom:1px solid var(--line);transition:background .15s;flex:none}
+.railitem img{max-width:64px;max-height:64px;object-fit:contain;pointer-events:none;filter:grayscale(1);opacity:.75;transition:.25s}
+.railitem:hover{background:rgba(127,120,108,.12)}
+.railitem:hover img{filter:grayscale(0);opacity:1}
+.railitem.on{background:var(--bg)}
+.railitem.on img{filter:grayscale(0);opacity:1;transform:scale(1.08)}
+.railitem.on::after{content:attr(data-no);position:absolute;left:6px;top:5px;font-family:var(--font-en);font-size:9px;letter-spacing:.06em;color:var(--accent)}
+.railpill{position:absolute;right:-1px;bottom:8px;transform:translateX(100%);display:none;
+  font-family:var(--font-cn);font-size:10px;letter-spacing:.1em;padding:3px 10px;background:var(--accent2);color:#fff;white-space:nowrap}
+.railitem.on .railpill{display:block}
+#railback{font-family:var(--font-cn);font-size:12px;letter-spacing:.1em;padding:12px 8px;border-top:1px solid var(--line);color:var(--sub)}
+#railback:hover{color:var(--ink);background:rgba(127,120,108,.12)}
+#catmain{position:absolute;left:96px;right:0;top:64px;bottom:0;overflow-y:auto;padding:4vh 4.5vw 90px}
+#cathead{margin-bottom:3vh}
+#catlabel{font-family:var(--font-en);font-size:11px;letter-spacing:.3em;color:var(--sub)}
+#catcount{float:right;font-family:var(--font-en);font-size:11px;letter-spacing:.2em;color:var(--sub)}
+#catepi{font-size:13.5px;line-height:1.9;color:var(--sub);border-left:3px solid var(--accent2);padding-left:14px;margin-bottom:26px}
+#catepi b{color:var(--ink);font-weight:700}
+#catbody{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:3.5vw;align-items:start}
+#catfig{position:relative;border:1px solid var(--line);background:var(--bg);padding:26px;min-height:44vh;display:flex;align-items:center;justify-content:center}
+#catfig img{max-width:100%;max-height:62vh;object-fit:contain;filter:drop-shadow(var(--sx,8px) var(--sy,8px) 0 var(--sh))}
+#catfig .fno{position:absolute;left:12px;top:10px;font-family:var(--font-en);font-size:11px;letter-spacing:.12em;color:var(--accent)}
+.catnav{position:absolute;bottom:-42px;display:flex;gap:18px;align-items:center;font-family:var(--font-en);font-size:12px;letter-spacing:.14em;color:var(--sub)}
+.catnav button{font-size:17px;padding:4px 10px;border:1px solid var(--line);transition:.15s}
+.catnav button:hover{border-color:var(--ink);color:var(--ink)}
+#cttitle{font-family:var(--font-cn);font-weight:700;font-size:clamp(20px,2vw,27px);line-height:1.5;margin-bottom:6px}
+#ctmeta{font-family:var(--font-en);font-size:11px;letter-spacing:.18em;color:var(--sub);margin-bottom:22px}
+#ctpoint{font-family:var(--font-cn);font-weight:700;font-size:clamp(19px,1.8vw,25px);line-height:1.65;margin:18px 0;padding:18px 0;border-top:1.5px solid var(--ink);border-bottom:1px solid var(--line)}
+#ctexcerpt{font-size:14px;line-height:2;color:var(--sub)}
+.ctkv{display:grid;grid-template-columns:80px 1fr;gap:4px 14px;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px;align-items:baseline}
+.ctkv .k{font-family:var(--font-en);font-size:9px;letter-spacing:.22em;color:var(--sub)}
+.ctkv .v{line-height:1.7}
+
+/* ── 双圈 12 小时钟表：右下角，转到夜晚时段自动夜间模式 ── */
+#clockwrap{position:fixed;right:18px;bottom:14px;z-index:70;user-select:none;
+  display:flex;flex-direction:column;align-items:center;gap:0}
+#clocksvg{display:block;cursor:pointer;overflow:visible}
+#clocksvg .face{fill:none;stroke:var(--ink);stroke-width:1.5}
+#clocksvg .tick{stroke:var(--sub);stroke-width:1}
+#clocksvg .tick.big{stroke:var(--ink);stroke-width:1.6}
+#clockhand{stroke:var(--accent);stroke-width:2;stroke-linecap:round}
+#clocksvg .hub{fill:var(--accent)}
+#sunmark,#moonmark{font-size:9px;fill:var(--sub);text-anchor:middle;font-family:var(--font-en)}
+#clocklabel{font-family:var(--font-en);font-size:10px;letter-spacing:.3em;color:var(--sub);margin-top:-4px}
+#clocklabel b{font-weight:400;color:var(--ink)}
+body.night #clockhand{stroke:#D9A05B}
+body.night #clocksvg .face{stroke:#F2E3B6}
+
+/* ── 挂绳：横穿画布的多条挂绳，高不透明底色区分，可拖动/收起；粗细分三档 ── */
+.ropeband{position:absolute;left:0;width:100%;height:110px;z-index:14;
+  background:rgba(213,192,150,.5);border-top:1px solid var(--line);border-bottom:1px solid var(--line);cursor:grab}
+body.dark .ropeband{background:rgba(160,132,88,.42)}
+.ropeband.th1{height:88px}
+.ropeband.th3{height:132px}
+.ropeband:active{cursor:grabbing}
+.ropeband .rl{position:absolute;left:0;right:0;top:30px;border-top:2px solid var(--ink);opacity:.75;pointer-events:none}
+.ropeband.th1 .rl{border-top-width:1px}
+.ropeband.th3 .rl{border-top-width:4px}
+.ropeband .rl::before,.ropeband .rl::after{content:'';position:absolute;top:-4px;width:7px;height:7px;background:var(--ink)}
+.ropeband .rl::before{left:8px}.ropeband .rl::after{right:8px}
+.ropeband .rtag{position:absolute;left:14px;top:6px;font-family:var(--font-cn);font-size:10px;letter-spacing:.2em;color:var(--ink);opacity:.65;pointer-events:none}
+.ropeband .ropex{position:absolute;right:10px;top:6px;width:22px;height:22px;font-size:14px;line-height:1;color:var(--sub);
+  border:1px solid var(--line);background:var(--bg);display:flex;align-items:center;justify-content:center}
+.ropeband .ropex:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+/* 挂绳收起钮：独立 fixed 定位钉在视口右缘、置顶，画布多宽/物件堆多少都压不住，随时可点掉 */
+.ropex2{position:fixed;right:16px;z-index:500;width:24px;height:24px;font-size:14px;line-height:1;color:var(--sub);
+  border:1px solid var(--line);background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.ropex2:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+body.gathered .ropex2,body.incat .ropex2{display:none}
+.obj.hung{z-index:18}
+.obj.hung .inner{animation:sway 3.6s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-2.8deg)}50%{transform:rotate(2.8deg)}}
+/* 耙痕：画布上的耙动轨迹 */
+#rakemarks{position:absolute;left:0;top:0;pointer-events:none;z-index:12}
+#rakemarks path{fill:none;stroke:var(--ink);stroke-linecap:round;opacity:.14}
+
+/* ── 翻（竹匾）：悬浮档案卡片，仅底部圆形竹匾执行翻动动画 ── */
+#flipcard{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;
+  background:rgba(59,56,51,.28);padding:5vh 5vw}
+body.dark #flipcard{background:rgba(10,6,4,.5)}
+#flipcard.on{display:flex;animation:fade .2s ease}
+#fcpanel{position:relative;background:var(--bg);border:1px solid var(--line);width:min(860px,100%);max-height:88vh;overflow-y:auto;
+  padding:38px 44px 132px;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:38px;align-items:start}
+#fcclose{position:absolute;top:0;right:0;width:44px;height:44px;font-size:20px;border-left:1px solid var(--line);border-bottom:1px solid var(--line)}
+#fcclose:hover{background:var(--accent);color:#fff}
+#fcvisual{display:flex;align-items:center;justify-content:center;border:1px solid var(--line);padding:22px;min-height:300px;background:var(--bg)}
+#fcvisual img{max-width:100%;max-height:54vh;object-fit:contain;filter:drop-shadow(8px 8px 0 var(--sh))}
+#fctitle{font-family:var(--font-cn);font-weight:700;font-size:clamp(19px,1.9vw,25px);line-height:1.5;margin-bottom:8px}
+#fcmeta{font-family:var(--font-en);font-size:11px;letter-spacing:.18em;color:var(--sub);margin-bottom:16px}
+#fcpoint{font-family:var(--font-cn);font-weight:700;font-size:16.5px;line-height:1.75;margin:14px 0;padding:14px 0;
+  border-top:1.5px solid var(--ink);border-bottom:1px solid var(--line)}
+#fcexc{font-size:14px;line-height:1.95;color:var(--sub)}
+#fckv{margin-top:14px}
+#fctray{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);width:88px;height:88px;border-radius:50%;
+  border:1.5px solid var(--ink);cursor:pointer;perspective:900px;
+  background:
+    repeating-radial-gradient(circle at 50% 50%, transparent 0 12px, rgba(59,56,51,.10) 12px 13px),
+    repeating-conic-gradient(from 0deg at 50% 50%, transparent 0deg 20deg, rgba(59,56,51,.06) 20deg 21deg),
+    var(--bg);
+  box-shadow:5px 6px 0 var(--sh);display:flex;align-items:center;justify-content:center}
+#fctraycard{position:relative;width:76%;height:76%;transform-style:preserve-3d;transition:transform .6s var(--ease)}
+#fctraycard.flip{transform:rotateY(180deg)}
+#flipcard.open #fctraycard{animation:trayin .85s var(--ease)}
+@keyframes trayin{0%{transform:rotateY(95deg) scale(.5);opacity:0}100%{transform:rotateY(0) scale(1);opacity:1}}
+#fctraycard .tface{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  display:flex;align-items:center;justify-content:center;border-radius:50%;overflow:hidden}
+#fctraycard .tface img{max-width:92%;max-height:92%;object-fit:contain}
+#fctraycard .tback{transform:rotateY(180deg)}
+
+/* ── 挂绳配置面板：吸附在左侧边的抽屉 ── */
+#hangcfg{position:fixed;left:60px;top:120px;z-index:75;display:none;width:238px;
+  background:var(--bg);border:1px solid var(--line);border-left:4px solid var(--ink);padding:16px 18px 14px;
+  box-shadow:6px 7px 0 var(--sh)}
+#hangcfg.on{display:block;animation:pop .25s var(--ease)}
+#hangcfg .hc-head{font-family:var(--font-cn);font-weight:700;font-size:14px;letter-spacing:.08em;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+#hcclose{width:24px;height:24px;font-size:15px;color:var(--sub);border:1px solid var(--line)}
+#hcclose:hover{background:var(--accent);color:#fff}
+#hangcfg .hc-row{display:flex;align-items:center;justify-content:space-between;font-family:var(--font-cn);font-size:13px;padding:7px 0;border-top:1px solid var(--line)}
+.hc-step{display:flex;align-items:center;gap:10px}
+.hc-step button{width:24px;height:24px;border:1.5px solid var(--ink);font-size:14px;line-height:1}
+.hc-step button:hover{background:var(--ink);color:#fff}
+.hc-step b{font-family:var(--font-en);font-weight:400;min-width:16px;text-align:center}
+.hc-th{display:flex;gap:6px}
+.hc-th button{font-family:var(--font-cn);font-size:12px;padding:3px 12px;border:1.5px solid var(--ink)}
+.hc-th button.on{background:var(--ink);color:#fff}
+#hangcfg .hc-note{font-size:11px;color:var(--sub);padding:6px 0 10px;border-top:1px solid var(--line)}
+#hcgen{width:100%;font-family:var(--font-cn);font-size:13px;letter-spacing:.2em;padding:9px 0;border:1.5px solid var(--ink);transition:.15s}
+#hcgen:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+#hangcfg .hc-hint{font-size:10.5px;color:var(--sub);line-height:1.8;padding-top:10px}
+
+/* ── 收拢：虚拟粒子谷堆 ── */
+#pilecv{position:fixed;inset:0;z-index:45;display:none;pointer-events:none}
+#piletip{position:fixed;z-index:46;display:none;pointer-events:none;background:var(--bg);border:1px solid var(--line);
+  padding:7px 14px;font-family:var(--font-cn);font-size:12.5px;line-height:1.6;box-shadow:4px 4px 0 var(--sh);max-width:280px}
+#piletip b{font-weight:700}
+#piletip span{display:block;font-family:var(--font-en);font-size:9.5px;letter-spacing:.14em;color:var(--sub)}
+/* 谷堆粒子点按旋开的圆窗：后点开的叠压在上面 */
+.pilebub{position:fixed;z-index:60;width:190px;height:190px;border-radius:50%;background:var(--bg);
+  border:1.5px solid var(--ink);box-shadow:5px 6px 0 var(--sh);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;padding:26px;text-align:center;box-sizing:border-box;
+  transform:translate(-50%,-50%);animation:bubspin .45s var(--ease)}
+@keyframes bubspin{from{transform:translate(-50%,-50%) scale(.15) rotate(-160deg);opacity:0}}
+.pilebub img{max-width:56%;max-height:40%;object-fit:contain}
+.pilebub b{font-family:var(--font-cn);font-size:11.5px;line-height:1.4;font-weight:700;max-width:150px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pilebub span{font-family:var(--font-en);font-size:8.5px;letter-spacing:.1em;color:var(--sub)}
+.pilebub p{margin:0;font-family:var(--font-cn);font-size:9.5px;line-height:1.5;color:var(--sub);
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.pilebub .pbx{position:absolute;top:10px;right:14px;width:20px;height:20px;font-size:12px;line-height:1;color:var(--sub);border:1px solid var(--line);border-radius:50%;background:var(--bg)}
+.pilebub .pbx:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+body.gathered .obj{opacity:0!important;pointer-events:none}
+body.gathered .ropeband{opacity:0;pointer-events:none}
+
+/* ── 页眉图形图标按钮 ── */
+.navico{width:35px;height:35px;border:1.5px solid var(--ink);border-radius:999px;display:flex;align-items:center;justify-content:center;transition:.18s;background:transparent}
+.navico svg{width:17px;height:17px;stroke:var(--ink);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;transition:stroke .18s}
+.navico:hover{background:var(--ink)}
+.navico:hover svg{stroke:#fff}
+
+/* ── 阅读层（筛）：一段纯文本贴着抠图轮廓排布，落在物件下方 ── */
+#reader{position:fixed;inset:0;z-index:190;display:none;background:transparent}
+#reader.on{display:block;animation:fade .25s ease}
+#readbox{position:absolute;width:min(460px,88vw);pointer-events:auto;
+  background:var(--bg);border:1px solid var(--line);padding:20px 22px 14px;
+  box-shadow:6px 7px 0 var(--sh)}
+#rcut{float:left;width:46%;margin:4px 18px 4px 0;shape-image-threshold:.35;
+  filter:drop-shadow(5px 5px 0 var(--sh))}
+#rplain{font-size:15px;line-height:2.05;color:var(--ink);text-align:left;min-height:2em;letter-spacing:.01em}
+#rhint{font-family:var(--font-cn);font-size:10px;letter-spacing:.24em;color:var(--sub);margin-top:18px;opacity:.7;clear:both}
+/* 阅读时：场上物件退成隐约的剪影，文字浮出 */
+body.reading .obj{opacity:.14;pointer-events:none}
+body.reading .obj img{filter:grayscale(1) drop-shadow(3px 3px 0 var(--sh))!important}
+/* 打字机光标 */
+.typecur{display:inline-block;width:.55em;height:1.05em;background:var(--accent);vertical-align:-0.15em;
+  animation:blink .8s steps(1) infinite;margin-left:1px}
+@keyframes blink{50%{opacity:0}}
+
+/* ── 竹匾 · 手翻书：圆形竹匾承载，正面抠图、反面隐藏的简短文字 ── */
+#trayview{position:fixed;inset:0;z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+  background:var(--bg)}
+#trayview.on{display:flex;animation:fade .25s ease}
+#tray{position:relative;width:min(56vh,440px);height:min(56vh,440px);border-radius:50%;cursor:pointer;
+  background:radial-gradient(circle at 50% 42%,#D9BE92 0%,#C7AC79 62%,#B99B66 100%);
+  border:10px solid #A9885A;
+  box-shadow:inset 0 0 0 3px rgba(59,56,51,.18),inset 0 6px 22px rgba(59,56,51,.22),10px 14px 0 var(--sh)}
+body.dark #tray{background:radial-gradient(circle at 50% 42%,#5A4632,#4E3C2A 62%,#463525);border-color:#3A2C1E}
+#tray::before{content:'';position:absolute;inset:14px;border-radius:50%;pointer-events:none;
+  background:repeating-conic-gradient(from 0deg,rgba(59,56,51,.06) 0deg 6deg,transparent 6deg 12deg)}
+#tray.shake{animation:trayshake .38s ease}
+@keyframes trayshake{0%,100%{transform:rotate(0)}20%{transform:rotate(-3.5deg)}45%{transform:rotate(3deg)}70%{transform:rotate(-1.6deg)}}
+#traycard{position:absolute;inset:24px;border-radius:50%;transform-style:preserve-3d;transition:transform .7s var(--ease)}
+#traycard.flip{transform:rotateY(180deg)}
+#traycard .tface{position:absolute;inset:0;border-radius:50%;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  display:flex;align-items:center;justify-content:center;padding:12%}
+#traycard .tback{transform:rotateY(180deg)}
+#trayimg{max-width:100%;max-height:100%;filter:drop-shadow(4px 5px 0 rgba(59,56,51,.25))}
+#traytext{font-family:var(--font-cn);font-size:14.5px;line-height:2;color:var(--ink);text-align:center}
+#trayidx{font-family:var(--font-en);font-size:11px;letter-spacing:.3em;color:var(--sub)}
+#traynav{display:flex;gap:14px;align-items:center}
+#traynav button{border:1.5px solid var(--ink);border-radius:999px;padding:8px 22px;font-family:var(--font-cn);font-size:13px;letter-spacing:.2em;transition:.18s;background:transparent;color:var(--ink)}
+#traynav button:hover{background:var(--ink);color:#fff}
+#trayclose{position:absolute;top:24px;right:32px;font-size:20px;width:40px;height:40px;border:1.5px solid var(--ink);border-radius:999px;background:transparent;color:var(--ink);transition:.18s}
+#trayclose:hover{background:var(--ink);color:#fff}
+
+/* ── 通用 ── */
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes pop{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.kv{display:grid;grid-template-columns:92px 1fr;gap:6px 18px;padding:9px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.kv .k{font-family:var(--font-en);font-size:10px;letter-spacing:.24em;color:var(--sub)}
+.kv .v{font-size:15px;line-height:1.7}
+
+/* ── 信息弹层（项目/菜单） ── */
+.sheet{position:fixed;inset:0;z-index:210;background:rgba(59,56,51,.32);display:none;align-items:center;justify-content:center;padding:6vh 8vw}
+body.dark .sheet{background:rgba(10,6,4,.55)}
+.sheet.on{display:flex;animation:fade .2s ease}
+.sheet .panel{position:relative;background:var(--bg);border:1px solid var(--line);width:min(680px,100%);max-height:84vh;overflow-y:auto;padding:44px 48px;animation:pop .3s var(--ease)}
+.sheet h2{font-family:var(--font-cn);font-weight:700;font-size:30px;letter-spacing:.04em;margin-bottom:6px}
+.sheet .en{font-family:var(--font-en);font-size:10px;letter-spacing:.34em;color:var(--sub);display:block;margin-bottom:26px}
+.sheet p{font-size:15px;line-height:1.9;margin-bottom:14px}
+.sheet .kv{border-bottom:none;padding:5px 0}
+.sheetclose{position:absolute;top:0;right:0;width:44px;height:44px;font-size:20px;border-left:1px solid var(--line);border-bottom:1px solid var(--line)}
+.sheetclose:hover{background:var(--accent);color:#fff}
+
+body.pre header,body.pre #tools,body.pre #clockwrap,body.pre #scroll,body.pre #tagpanel{cursor:none}
+#intro{position:fixed;inset:0;z-index:400;background:#E7DCBE;overflow:hidden}
+#intro .ibg{position:absolute;inset:0;opacity:0;transition:opacity 1.4s ease;background:var(--concrete) center/cover no-repeat}
+#igrain{position:absolute;inset:0;z-index:2;transition:opacity 1.3s ease}
+#igrain.clear{opacity:0}
+#ihint{position:absolute;left:50%;bottom:9vh;transform:translateX(-50%);z-index:3;font-family:var(--font-cn);font-size:13px;letter-spacing:.28em;color:var(--introink,#3B3833);transition:opacity 1.2s ease;pointer-events:none;white-space:nowrap}
+#iskip{position:absolute;right:4vw;bottom:5vh;z-index:4;font-family:var(--font-en);font-size:10px;letter-spacing:.26em;color:var(--introink,#3B3833);opacity:.6;padding:6px 4px;border-bottom:1px solid rgba(0,0,0,.2)}
+#iskip:hover{opacity:1}
+body.dark #intro{background:#2E211A}
+body.dark #ihint,body.dark #iskip{color:#B9A88A}
+
+/* ── 自适应画布 ── */
+#board{position:relative;margin:0 auto;width:100%;max-width:none;min-height:100vh;padding:120px 4vw 150px 116px}
+
+/* ── 夜间模式 ── */
+body.night{--panel:rgba(30,22,16,.66);--ink:#F2E3B6;--sub:#B9A88A;--line:rgba(242,227,182,.26);--accent:#D9A05B}
+body.night #glow{background:radial-gradient(560px circle at var(--mx,70vw) var(--my,20vh),rgba(255,196,110,.26),rgba(255,180,90,.04) 58%,rgba(0,0,0,0) 100%)}
+#btnnight.on{background:var(--ink);color:var(--bg)}
+
+/* ── 弹窗打开时恢复系统鼠标（修复农具模式下卡片无法操作） ── */
+body.modal-open #cur{display:none!important}
+body.modal-open,body.modal-open *{cursor:auto!important}
+
+/* ── 分类弹窗（图形化类别入口） ── */
+#catopts{display:flex;flex-direction:column}
+#catopts button{display:grid;grid-template-columns:84px 1fr;grid-template-rows:auto auto;column-gap:18px;align-items:center;text-align:left;
+  padding:14px 12px;border-top:1px solid var(--line);transition:background .18s}
+#catopts button:hover{background:rgba(127,120,108,.12)}
+#catopts .catthumb{grid-row:1/3;width:84px;height:64px;display:flex;align-items:center;justify-content:center;position:relative}
+#catopts .catthumb img{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(4px 4px 0 var(--sh));transition:transform .25s var(--ease)}
+#catopts button:hover .catthumb img{transform:scale(1.08) rotate(-2deg)}
+#catopts .catthumb b{position:absolute;right:0;bottom:-4px;font-family:var(--font-cn);font-weight:700;font-size:17px;line-height:1;
+  background:var(--bg);padding:2px 5px;border:1px solid var(--line)}
+#catopts span{font-family:var(--font-en);font-size:10px;letter-spacing:.26em;color:var(--sub)}
+#catopts i{grid-column:2;font-style:normal;font-family:var(--font-cn);font-size:13px;color:var(--sub)}
+
+/* ── 分类视图：无框左栏 + 悬停滚动；分类界面始终恢复系统鼠标 ── */
+body.incat #tooldock,body.incat #tagpanel,body.incat #hangcfg,body.incat #cur{display:none!important}
+body.incat,body.incat *{cursor:auto!important}
+#rail{background:transparent;backdrop-filter:none}
+#raillist{scrollbar-width:none}
+#raillist::-webkit-scrollbar{display:none}
+.railitem{border-bottom:none;height:86px}
+.railitem img{max-width:58px;max-height:58px;filter:grayscale(.7);opacity:.62}
+.railitem:hover img{filter:grayscale(.2);opacity:1}
+
+/* ── 加载页：鸟啄谷物 ── */
+#loader{position:fixed;inset:0;z-index:390;background:#F3EBD9;display:none}
+#loader.on{display:block}
+#loader.fade{opacity:0;transition:opacity .6s ease}
+#ldcv{position:absolute;inset:0;width:100%;height:100%}
+#loadtext{position:absolute;left:0;right:0;bottom:10vh;text-align:center;z-index:2}
+#loadtext b{font-family:var(--font-cn);font-weight:700;font-size:24px;letter-spacing:.4em;margin-left:.4em;display:block;color:#4A4437}
+#loadtext span{font-family:var(--font-en);font-size:10px;letter-spacing:.42em;color:#8A8272;display:block;margin-top:8px}
+
+@media (max-width:900px){
+  #board{width:calc(100% - 90px)}
+  #card{grid-template-columns:1fr}
+  #visual{border-right:none;border-bottom:1px solid var(--line);min-height:280px}
+  .brand h1{font-size:22px}
+  #catbody{grid-template-columns:1fr}
+  #tooldock{top:auto;bottom:0;left:0;right:0}
+  #toolstrip{display:none}
+  #tools{flex-direction:row;transform:none;height:auto;width:100%;justify-content:center}
+  .tool{border-bottom:none}
+  #tagpanel{left:0;bottom:200px;top:auto;transform:none}
+  #clocksvg{width:84px;height:84px}
+}
+</style>
+</head>
+<body class="pre ">
+
+<div id="intro">
+  <div class="ibg"></div>
+  <canvas id="igrain"></canvas>
+  <div id="ihint">移动鼠标 拨开谷粒</div>
+  <button id="iskip">跳过</button>
+</div>
+
+<div id="loader">
+  <canvas id="ldcv"></canvas>
+  <div id="loadtext"><b>晒场</b><span>正在入场</span></div>
+</div>
+
+<div id="concrete"></div>
+<div id="tint"></div>
+<div id="glow"></div>
+
+<header>
+  <div class="brand"><span class="chip">晒场档案</span><h1>SUN FIELD</h1></div>
+  <nav id="mainnav">
+    <button class="navico" id="btnproj" title="项目 ABOUT" aria-label="项目">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="4.6"/><line x1="12" y1="2.4" x2="12" y2="4"/><line x1="4.6" y1="10" x2="6.2" y2="10"/><line x1="17.8" y1="10" x2="19.4" y2="10"/><line x1="3" y1="17.5" x2="21" y2="17.5"/><line x1="6.5" y1="21" x2="17.5" y2="21"/></svg>
+    </button>
+    <button class="navico" id="btncat" title="分类 CATEGORY" aria-label="分类">
+      <svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7.4" height="7.4"/><rect x="13.1" y="3.5" width="7.4" height="7.4"/><rect x="3.5" y="13.1" width="7.4" height="7.4"/><rect x="13.1" y="13.1" width="7.4" height="7.4"/></svg>
+    </button>
+    <button class="pill btnmenu" id="btnmenu">≡</button>
+    <div class="zoom"><button id="zout">−</button><b id="zlab">100%</b><button id="zin">+</button></div>
+  </nav>
+</header>
+<div class="sheet" id="sheetcat">
+  <div class="panel">
+    <button class="close sheetclose" aria-label="关闭">×</button>
+    <h2>分类</h2><span class="en">BROWSE BY CATEGORY</span>
+    <div id="catopts">
+      <button data-f="all"><span class="catthumb" data-c="all"></span><span>ALL · <i class="cnt-all"></i></span><i>回到完整晒场画布</i></button>
+      <button data-f="场"><span class="catthumb" data-c="场"></span><span>FIELD · <i class="cnt-场"></i></span><i>多元晒场场域：乡土实体到虚拟场域</i></button>
+      <button data-f="物"><span class="catthumb" data-c="物"></span><span>OBJECT · <i class="cnt-物"></i></span><i>被晾晒的客体：物产、织物、旧物</i></button>
+      <button data-f="人"><span class="catthumb" data-c="人"></span><span>PEOPLE · <i class="cnt-人"></i></span><i>社群与隐喻主体：暴露与遮蔽</i></button>
+    </div>
+  </div>
+</div>
+
+<div id="tooldock">
+  <div id="toolstrip" title="农具架"><span>农 具 架</span></div>
+  <aside id="tools">
+  <button class="tool on" data-t="browse" title="翻找 · 浏览：普通鼠标，点按物件弹出悬浮档案卡片，可查阅内容与原始图像">
+    <svg viewBox="0 0 32 32"><line x1="21" y1="3" x2="12" y2="19"/><path d="M12 19 C8 21 6 26 7 29 C12 28 16 25 17 21 Z"/><path d="M18 6 q3-2 6 0" stroke-width="1"/></svg>
+    <span class="cn">找</span>
+  </button>
+  <button class="tool" data-t="rake" title="耙子 · 耙：点按后物件先按 场/物/人 聚拢成三堆；用耙子拖动耙开——耙得少维持堆叠，从左划到右全部摊开；耙痕保留，切换农具后消失">
+    <svg viewBox="0 0 32 32"><line x1="16" y1="2" x2="16" y2="18"/><path d="M5 21 q11-4 22 0"/><line x1="8" y1="21.4" x2="8" y2="29"/><line x1="13.3" y1="20.4" x2="13.3" y2="29"/><line x1="18.7" y1="20.4" x2="18.7" y2="29"/><line x1="24" y1="21.4" x2="24" y2="29"/></svg>
+    <span class="cn">耙</span>
+  </button>
+  <button class="tool" data-t="sieve" title="筛网 · 筛：点按物件，粒子沿抠图轮廓在原位散开，档案文字在原位置打字机显现；再点收回">
+    <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12"/><line x1="6.5" y1="11" x2="25.5" y2="11" stroke-width="1"/><line x1="5" y1="16" x2="27" y2="16" stroke-width="1"/><line x1="6.5" y1="21" x2="25.5" y2="21" stroke-width="1"/><line x1="11" y1="6.5" x2="11" y2="25.5" stroke-width="1"/><line x1="16" y1="5" x2="16" y2="27" stroke-width="1"/><line x1="21" y1="6.5" x2="21" y2="25.5" stroke-width="1"/></svg>
+    <span class="cn">筛</span>
+  </button>
+  <button class="tool" data-t="traybook" title="竹匾 · 手翻书：进入圆形竹匾界面，逐条翻阅档案——正面抠图，点按翻面看背后隐藏的简短文字">
+    <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12.5"/><path d="M7.5 12.5 q8.5 5 17 0" stroke-width="1"/><path d="M7.5 19.5 q8.5-5 17 0" stroke-width="1"/><path d="M12.5 7.5 q5 8.5 0 17" stroke-width="1"/><path d="M19.5 7.5 q-5 8.5 0 17" stroke-width="1"/></svg>
+    <span class="cn">翻</span>
+  </button>
+  <button class="tool" data-t="hang" title="挂绳 · 挂：弹出面板上选择绳子数量与粗细（粗细区分组别），拖动素材到绳上吸附悬挂；绳可点 × 隐藏，不隐藏则随页面滑动跟随">
+    <svg viewBox="0 0 32 32"><path d="M3 9 C8 6.5 12 11.5 16 9 S24 6.5 29 9"/><path d="M16 9.6 v3.4"/><path d="M13.4 13.6 a2.8 2.8 0 1 0 5.2 0"/><rect x="11" y="17" width="10" height="11" stroke-width="1.4"/></svg>
+    <span class="cn">挂</span>
+  </button>
+  <button class="tool" data-t="gather" title="麻袋 · 收拢：全部作品化作虚拟粒子谷堆——一颗粒子一件作品，晾晒高度高的在堆顶；悬浮粒子看信息">
+    <svg viewBox="0 0 32 32"><path d="M11 12 C11 4.5 21 4.5 21 12"/><path d="M6 12 L26 12 L22.5 28 L9.5 28 Z"/><path d="M8 17 q8 2.5 16 0" stroke-width="1"/><path d="M9 22.5 q7 2 14 0" stroke-width="1"/></svg>
+    <span class="cn">收</span>
+  </button>
+  </aside>
+</div>
+
+<div id="tagpanel">
+  <div class="tphead">年代标签 FILTER BY ERA</div>
+  <div id="taglist"></div>
+  <button id="tagclear">清除选择 CLEAR</button>
+</div>
+<canvas id="burst"></canvas>
+<div id="cur"><svg viewBox="0 0 40 40" id="cursvg"></svg></div>
+
+<button id="clearfx" title="清除效果：一扫把掉当前画布上所有农具效果（耙痕/挂绳/谷堆/展开的文字），回到初始平铺">
+  <svg viewBox="0 0 32 32"><line x1="20" y1="3" x2="11" y2="18"/><path d="M11 18 L6 27 Q13 30 19 26 L14 17 Z"/><line x1="9" y1="22.5" x2="13.5" y2="20.5" stroke-width="1"/><line x1="11" y1="25" x2="15.5" y2="23" stroke-width="1"/><line x1="13" y1="27" x2="17" y2="25" stroke-width="1"/></svg>
+  <span>清</span>
+</button>
+
+<main id="scroll"><div id="board"></div></main>
+
+<section id="catview">
+  <aside id="rail">
+    <div id="railhead"><b id="railcat">场</b><span id="railen">FIELD</span></div>
+    <div id="raillist"></div>
+    <button id="railback">← 全部档案</button>
+  </aside>
+  <div id="catmain">
+    <div id="cathead">
+      <span id="catcount"></span>
+      <span id="catlabel"></span>
+    </div>
+    <div id="catbody">
+      <figure id="catfig"><span class="fno" id="cfno"></span><img id="catimg" alt="">
+        <div class="catnav"><button id="cprev">←</button><span id="cidx"></span><button id="cnext">→</button></div>
+      </figure>
+      <div id="cattext">
+        <p id="catepi"></p>
+        <h3 id="cttitle"></h3>
+        <div id="ctmeta"></div>
+        <div class="ctkv"><span class="k">类别 CAT</span><span class="v" id="ctcat"></span></div>
+        <div class="ctkv"><span class="k">年代 YEAR</span><span class="v" id="ctyear"></span></div>
+        <div class="ctkv"><span class="k">出处 SRC</span><span class="v" id="ctauthor"></span></div>
+        <div class="ctkv"><span class="k">标签 TAG</span><span class="v" id="cttag"></span></div>
+        <p id="ctpoint"></p>
+        <p id="ctexcerpt"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 双圈 12 小时钟表：第1圈 0—12、第2圈 12—24，指针入夜自动夜间模式 -->
+<div id="clockwrap">
+  <svg id="clocksvg" viewBox="0 0 120 120" width="104" height="104">
+    <circle class="face" cx="60" cy="60" r="52"/>
+    <g id="clockticks"></g>
+    <text id="sunmark" x="60" y="17">12</text>
+    <text id="moonmark" x="60" y="113">6</text>
+    <line id="clockhand" x1="60" y1="60" x2="60" y2="16"/>
+    <circle class="hub" cx="60" cy="60" r="3.2"/>
+  </svg>
+  <div id="clocklabel"><b id="clock">10:00</b></div>
+</div>
+
+<!-- 阅读层（筛）：粒子散开后，一段纯文本贴着抠图轮廓、落在物件下方 -->
+<div id="reader">
+  <div id="readbox">
+    <img id="rcut" alt="">
+    <p id="rplain"></p>
+    <div id="rhint">再次点按 收回文字</div>
+  </div>
+</div>
+
+<!-- 竹匾 · 手翻书：圆形竹匾逐条翻阅，正面抠图、反面隐藏的简短文字 -->
+<div id="trayview">
+  <button id="trayclose" aria-label="关闭">×</button>
+  <div id="tray" title="点按翻面">
+    <div id="traycard">
+      <div class="tface tfront"><img id="trayimg" alt=""></div>
+      <div class="tface tback"><p id="traytext"></p></div>
+    </div>
+  </div>
+  <div id="trayidx">01 / 130</div>
+  <div id="traynav">
+    <button id="trayprev">← 上一条</button>
+    <button id="trayrand" title="随机翻开一件作品">随机 ⚄</button>
+    <button id="traynext">下一条 →</button>
+  </div>
+</div>
+
+<!-- 翻（竹匾）：悬浮档案卡片，底部圆形竹匾翻动 -->
+<div id="flipcard">
+  <div id="fcpanel">
+    <button id="fcclose" aria-label="关闭">×</button>
+    <figure id="fcvisual"><img id="fcimg" alt=""></figure>
+    <div id="fctext">
+      <h3 id="fctitle"></h3>
+      <div id="fcmeta"></div>
+      <p id="fcpoint"></p>
+      <p id="fcexc"></p>
+      <div id="fckv">
+        <div class="kv"><span class="k">类别 CAT</span><span class="v" id="fccat"></span></div>
+        <div class="kv"><span class="k">年代 YEAR</span><span class="v" id="fcyear"></span></div>
+        <div class="kv"><span class="k">出处 SRC</span><span class="v" id="fcauthor"></span></div>
+        <div class="kv"><span class="k">标签 TAG</span><span class="v" id="fctag"></span></div>
+      </div>
+    </div>
+    <div id="fctray" title="点按翻面">
+      <div id="fctraycard">
+        <div class="tface tfront"><img id="fctrayimg" alt=""></div>
+        <div class="tface tback"><img id="fctrayimg2" alt=""></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 挂绳配置面板 -->
+<div id="hangcfg">
+  <div class="hc-head">挂绳设置 <button id="hcclose" aria-label="收起面板">×</button></div>
+  <div class="hc-row"><span>数量</span>
+    <div class="hc-step"><button id="hcminus">−</button><b id="hcnum">2</b><button id="hcplus">+</button></div>
+  </div>
+  <div class="hc-row"><span>粗细</span>
+    <div class="hc-th">
+      <button data-th="1">细</button><button data-th="2" class="on">中</button><button data-th="3">粗</button>
+    </div>
+  </div>
+  <div class="hc-note">粗细用于区分分类组别，可多次生成</div>
+  <button id="hcgen">生成挂绳</button>
+  <div class="hc-hint">拖动素材到绳上吸附悬挂 · 绳端 × 收起单绳</div>
+</div>
+
+<!-- 收拢：虚拟粒子谷堆 -->
+<canvas id="pilecv"></canvas>
+<div id="piletip"></div>
+
+<div class="sheet" id="sheetproj">
+  <div class="panel">
+    <button class="close sheetclose" aria-label="关闭">×</button>
+    <h2>晒场</h2><span class="en">SUN FIELD — ABOUT</span>
+    <p>晒场，谷物被摊开的空地：暴晒、翻搅、收拢，年复一年。这个词里同时住着「场」——从乡土晒谷场到广场、屏幕与虚拟空间；住着「物」——被晾晒的农耕物产、织物与私人旧物；也住着「人」——劳作者、邻里与暴露在阳光下、记忆与公开之间的个体。</p>
+    <p>本档案以「晒」为透镜，收录艺术史与大众文化中的一百三十个案例：绘画、摄影、电影、装置与网络图像。它们被摊在同一片水泥地上，可以被拖动、被翻晒还原色彩、被按年代筛选、被聚拢归类。影子始终指向光的方向——移动鼠标，就是移动太阳。</p>
+    <div class="kv"><span class="k">条目</span><span class="v" id="projcount"></span></div>
+    <div class="kv"><span class="k">分类</span><span class="v">场 FIELD · 物 OBJECT · 人 PEOPLE</span></div>
+    <div class="kv"><span class="k">字体</span><span class="v">方正兰亭黑 × Helvetica</span></div>
+  </div>
+</div>
+<div class="sheet" id="sheetmenu">
+  <div class="panel">
+    <button class="close sheetclose" aria-label="关闭">×</button>
+    <h2>菜单</h2><span class="en">MENU</span>
+    <div class="kv"><span class="k">农具架</span><span class="v">左侧通栏悬浮条，悬浮拉出木质农具架：翻找（鼠标浏览弹卡）、耙子（耙：聚拢三堆再耙开）、筛网（筛）、竹匾（手翻书新界面）、挂绳（挂）、麻袋（收）；点选后自动收回</span></div>
+    <div class="kv"><span class="k">翻找</span><span class="v">铁锹为默认态：恢复系统鼠标浏览画布；点按物件弹出档案卡片（原图与条目信息），底部竹匾盘翻动入场，点按竹匾翻面看原彩抠图</span></div>
+    <div class="kv"><span class="k">耙</span><span class="v">点按后物件先按 场/物/人 聚拢成三堆；用耙子拖动耙开——耙得少维持堆叠，从左划到右全部摊开；划过留下耙痕、复原素材原彩；切换农具后耙痕消失</span></div>
+    <div class="kv"><span class="k">筛</span><span class="v">点按物件，粒子沿抠图轮廓原位散开，一段纯文本打字机显现在图像原位置；再次点按收回文字、恢复图像；侧边可按年代标签过滤</span></div>
+    <div class="kv"><span class="k">竹匾</span><span class="v">进入手翻书界面：中央圆形竹匾正面为抠图、背面为隐喻文字，点按竹匾翻面，左右箭头翻页</span></div>
+    <div class="kv"><span class="k">挂</span><span class="v">面板选择绳子数量与粗细（粗细区分分类组别，可多次生成）；拖动素材到绳上吸附悬挂；绳端 × 收起单绳，挂绳随画布滚动不消失</span></div>
+    <div class="kv"><span class="k">收</span><span class="v">全部作品化作虚拟粒子谷堆：一颗粒子一件作品，按晾晒高度分层——高挂在堆顶、贴地在堆底；悬浮粒子查看作品信息，再点麻袋散开</span></div>
+    <div class="kv"><span class="k">分类</span><span class="v">页眉分类图标进入 场 / 物 / 人 独立页面</span></div>
+    <div class="kv"><span class="k">光</span><span class="v">移动鼠标微调光源；转动右下角钟表改变日照（两圈制：0—12 / 12—24），入夜自动切换夜间模式；投影长短暗示晾晒高度</span></div>
+    <div class="kv"><span class="k">缩放</span><span class="v">页眉 − / + 按钮，或 Ctrl + 滚轮；抓住空白地面可上下左右拖动画布（中键随处可拖）</span></div>
+  </div>
+</div>
+
+<script>
+const DATA = /*__DATA__*/[{"id":"场-01","cat":"场","title":"《农民的婚礼》","author":"老彼得·勃鲁盖尔","year":"1568","excerpt":"","point":"谷仓大厅里的宴席：晒场在庆典日变身公共厅堂","tag":"古代（史前—1840）","img":"assets/img/场-01.jpg","cut":"assets/tint/场-01.webp","ar":1.432,"px":144,"cutc":"assets/cutc/场-01.webp"},{"id":"场-02","cat":"场","title":"《平遥古城南大街晒秋》","author":"平遥古城/民俗摄影","year":"","excerpt":"","point":"明清古街的辣椒玉米阵列：旅游化的晒场成为景观橱窗","tag":"民俗/未标年代","img":"assets/img/场-02.jpg","cut":"assets/tint/场-02.webp","ar":1.0,"px":144,"cutc":"assets/cutc/场-02.webp"},{"id":"场-03","cat":"场","title":"《人民大会堂前的广场》","author":"北京·天安门广场","year":"1959","excerpt":"","point":"巨型尺度上的集体集会：国家权力的最宏晒场","tag":"现代（1949—1979）","img":"assets/img/场-03.jpg","cut":"assets/tint/场-03.webp","ar":1.432,"px":216,"cutc":"assets/cutc/场-03.webp"},{"id":"场-04","cat":"场","title":"《《雪中猎人》中的谷仓与晒场》","author":"老彼得·勃鲁盖尔","year":"1565","excerpt":"","point":"冬日冻土上的空场：晒场在闲置季显出骨架","tag":"古代（史前—1840）","img":"assets/img/场-04.jpg","cut":"assets/tint/场-04.webp","ar":1.432,"px":156,"cutc":"assets/cutc/场-04.webp"},{"id":"场-05","cat":"场","title":"《晒谷场（万玛才旦镜头前的藏地晒场）》","author":"万玛才旦《塔洛》等藏地影像","year":"2010","excerpt":"","point":"高原光下的青稞薄层：晒场作为最原初的露天劳动剧场","tag":"平台数字时代（2010—）","img":"assets/img/场-05.jpg","cut":"assets/tint/场-05.webp","ar":1.432,"px":156,"cutc":"assets/cutc/场-05.webp"},{"id":"场-06","cat":"场","title":"《格尔尼卡》","author":"巴勃罗·毕加索","year":"1937","excerpt":"","point":"碎裂的广场：战争的晒场摊开一地残肢","tag":"近代（1840—1949）","img":"assets/img/场-06.jpg","cut":"assets/tint/场-06.webp","ar":1.432,"px":200,"cutc":"assets/cutc/场-06.webp"},{"id":"场-07","cat":"场","title":"《收干草》","author":"约翰·康斯太勃尔","year":"1821","excerpt":"","point":"草垛在田间摊晒：移动的微型晒场","tag":"古代（史前—1840）","img":"assets/img/场-07.jpg","cut":"assets/tint/场-07.webp","ar":1.432,"px":184,"cutc":"assets/cutc/场-07.webp"},{"id":"场-08","cat":"场","title":"《大地艺术《螺旋形防波堤》》","author":"罗伯特·史密森","year":"1970","excerpt":"","point":"湖中的螺旋形石堤：大地本身被晾晒成雕塑","tag":"现代（1949—1979）","img":"assets/img/场-08.jpg","cut":"assets/tint/场-08.webp","ar":1.432,"px":184,"cutc":"assets/cutc/场-08.webp"},{"id":"场-09","cat":"场","title":"Jacquemus SS21 秀场","author":"秀场","year":"2021","excerpt":"","point":"将秀场设置在法国巴黎西北部公园的一片麦田中，呈现出极具诗意的南法田园风情。","tag":"平台数字时代（2010—）","img":"assets/img/场-09.jpg","cut":"assets/tint/场-09.webp","ar":1.0,"px":232,"cutc":"assets/cutc/场-09.webp"},{"id":"场-10","cat":"场","title":"《打谷场》","author":"老彼得·勃鲁盖尔","year":"1565","excerpt":"","point":"月分画里的谷粒翻飞：晒场是季节轮回的中转站","tag":"古代（史前—1840）","img":"assets/img/场-10.jpg","cut":"assets/tint/场-10.webp","ar":1.432,"px":144,"cutc":"assets/cutc/场-10.webp"},{"id":"场-11","cat":"场","title":"乌鸦群飞的麦田","author":"文森特·梵高","year":"1889","excerpt":"","point":"夜色替代日照的晾晒：天体成为最后的晒场光源","tag":"近代（1840—1949）","img":"assets/img/场-11.jpg","cut":"assets/tint/场-11.webp","ar":1.0,"px":184,"cutc":"assets/cutc/场-11.webp"},{"id":"场-13","cat":"场","title":"《晒谷场》","author":"侯登科","year":"1980","excerpt":"","point":"中国纪实摄影对晒场的'去浪漫化'记录","tag":"当代（1980—2009）","img":"assets/img/场-13.jpg","cut":"assets/tint/场-13.webp","ar":1.432,"px":144,"cutc":"assets/cutc/场-13.webp"},{"id":"场-14","cat":"场","title":"《晒盐场（莺歌海盐场）》","author":"海南莺歌海盐场","year":"1958","excerpt":"","point":"方格盐田的镜面反光：结晶是慢速的晒","tag":"现代（1949—1979）","img":"assets/img/场-14.jpg","cut":"assets/tint/场-14.webp","ar":1.432,"px":200,"cutc":"assets/cutc/场-14.webp"},{"id":"场-15","cat":"场","title":"《晒场计划》","author":"理查德·朗","year":"2010","excerpt":"","point":"晒场作为大地艺术的极简形式","tag":"平台数字时代（2010—）","img":"assets/img/场-15.jpg","cut":"assets/tint/场-15.webp","ar":1.432,"px":200,"cutc":"assets/cutc/场-15.webp"},{"id":"场-16","cat":"场","title":"《丰收》","author":"梵高","year":"","excerpt":"","point":"梵高退得很远，去观察丰收的景象。他将自己广角的透视方法与全新的全景视角进行融合。画作包含了所有我们理解的丰收的场景","tag":"民俗/未标年代","img":"assets/img/场-16.jpg","cut":"assets/tint/场-16.webp","ar":1.0,"px":184,"cutc":"assets/cutc/场-16.webp"},{"id":"场-17","cat":"场","title":"《诗经·豳风·七月》：场圃的历法","author":"佚名《诗经·豳风·七月》","year":"约西周初期（前11世纪—前771年）","excerpt":"（原文实录）“九月筑场圃，十月纳禾稼。黍稷重穋，禾麻菽麦。”（同篇：“九月肃霜，十月涤场。”）","point":"晒场是农耕历法的制度性空间：九月修筑场院、十月收纳谷物，“摊开—晾晒—归仓”的时间秩序在此发端，晒场先于粮食进入文明叙事。","tag":"古代（史前—1840）","img":"assets/img/场-17.jpg","cut":"assets/tint/场-17.webp","ar":0.604,"px":144,"cutc":"assets/cutc/场-17.webp"},{"id":"场-18","cat":"场","title":"张舜民《打麦》：打麦声应山北","author":"张舜民《打麦》","year":"北宋（11世纪）","excerpt":"（原文实录）“打麦打麦，彭彭魄魄，声在山南应山北。四月太阳出东北，才离海峤麦尚青，转到天心麦已熟。……田家以苦乃为乐，敢惮头枯面焦黑！”","point":"打麦声在山南应山北，晒场是声音与劳作的露天剧场；“以苦为乐”写尽生计艰辛中的生命韧性。","tag":"古代（史前—1840）","img":"assets/img/场-18.jpg","cut":"assets/tint/场-18.webp","ar":1.234,"px":156,"cutc":"assets/cutc/场-18.webp"},{"id":"场-22","cat":"场","title":"萧红《生死场》：人与牲畜共作的麦场","author":"萧红《生死场》","year":"1935","excerpt":"（原文实录）“老马自己在滚压麦穗，勒带在嘴下托着，它不偷食麦粒，它不走脱了轨，转过一个圈，再转过一个。麦穗在场上渐渐不成形了。”","point":"麦场是人与牲畜共同劳作的场域，生命在劳作、苦难中循环往复；晒场的牲畜性揭示乡土生命的粗粝本相。","tag":"近代（1840—1949）","img":"assets/img/场-22.jpg","cut":"assets/tint/场-22.webp","ar":0.615,"px":180,"cutc":"assets/cutc/场-22.webp"},{"id":"场-23","cat":"场","title":"莫言《丰乳肥臀》：正午打谷场","author":"莫言《丰乳肥臀》","year":"1995","excerpt":"（原文实录）“福生堂家的打谷场上，四匹大骡子拉着碌碡，转着圈跑起来。长工打着响鞭，轰着骡子。那边是一片人欢骡叫，碌碡在麦穗上颠动的声音，骡蹄践踏在麦穗上的声音，混合在正午的阳光里，金黄的麦穗，在骡蹄下翻着辉煌的波浪。”","point":"打谷晒场在正午强光下承载集体农事，劳动、身体、谷物在日光下一同被晾晒。","tag":"当代（1980—2009）","img":"assets/img/场-23.jpg","cut":"assets/tint/场-23.webp","ar":1.301,"px":156,"cutc":"assets/cutc/场-23.webp"},{"id":"场-27","cat":"场","title":"浩然《艳阳天》：集体麦场","author":"浩然《艳阳天》","year":"1964","excerpt":"（情节概述）（情节概述）东山坞麦场上麦子堆成小山，社员一边翻场晒粮一边商量分配，干部在人群里宣讲集体生产。","point":"集体时代的麦场：粮食晾晒、集体分配、政策宣讲在同一片露天场域同步展开，生产空间即政治动员空间。","tag":"现代（1949—1979）","img":"assets/img/场-27.jpg","cut":"assets/tint/场-27.webp","ar":1.297,"px":180,"cutc":"assets/cutc/场-27.webp"},{"id":"场-28","cat":"场","title":"贾平凹《秦腔》：夏夜打麦场","author":"贾平凹《秦腔》","year":"2005","excerpt":"（原文节录（引用时建议核对原书））（节录）“拉了席到打麦场上睡……走过了麦堆时将脚踩在麦堆里，又摇了几下。”","point":"打麦场是村民夏夜休憩、暗中观察、彼此监视的公共空间，个体隐秘小动作暴露在集体视野之下。","tag":"当代（1980—2009）","img":"assets/img/场-28.jpg","cut":"assets/tint/场-28.webp","ar":1.0,"px":168,"cutc":"assets/cutc/场-28.webp"},{"id":"场-29","cat":"场","title":"茅盾《春蚕》《秋收》：禁忌季节的稻场","author":"茅盾《春蚕》《秋收》","year":"1932／1933","excerpt":"（原文节录）“稻场上和小溪边顿时少了那些女人们的踪迹。一个‘戒严令’也在无形中颁布了：乡农们即使平日是最好的，也不往来；人客来冲了蚕神不是玩的！他们至多在稻场上低声交谈一二句就走开。这是个‘神圣’的季节。”","point":"稻场是蚕农村落的露天公共场院：平日聚集闲谈，“戒严令”颁布后只剩低声交谈——晒场的开放度随禁忌与权力收放。","tag":"近代（1840—1949）","img":"assets/img/场-29.jpg","cut":"assets/tint/场-29.webp","ar":1.0,"px":120,"cutc":"assets/cutc/场-29.webp"},{"id":"场-30","cat":"场","title":"肖洛霍夫《静静的顿河》：顿河打谷场","author":"肖洛霍夫《静静的顿河》","year":"1928—1940（全书四部）","excerpt":"（情节概述）（情节概述）打谷场上尘土飞扬、脱粒机轰鸣，哥萨克村民在此劳作、扬谷、聚会、交谈，家族恩怨与流言在这片公共场地上交织。","point":"顿河草原打谷场既是农耕劳作空间，也是哥萨克族群冲突、流言传播与命运起伏的公共舞台。","tag":"近代（1840—1949）","img":"assets/img/场-30.jpg","cut":"assets/tint/场-30.webp","ar":0.612,"px":156,"cutc":"assets/cutc/场-30.webp"},{"id":"场-31","cat":"场","title":"肖洛霍夫《被开垦的处女地》：集体农庄打谷场","author":"肖洛霍夫《被开垦的处女地》","year":"1932（第一部；第二部1960）","excerpt":"（情节概述）（情节概述）集体农庄打谷场上谷物堆积如山，集体劳动在此开展，新旧乡村秩序在晒场上碰撞博弈。","point":"集体化时代的打谷晒场成为重构乡村社会关系、展示集体劳动成果的政治公共场域。","tag":"近代（1840—1949）","img":"assets/img/场-31.jpg","cut":"assets/tint/场-31.webp","ar":1.566,"px":180,"cutc":"assets/cutc/场-31.webp"},{"id":"场-33","cat":"场","title":"老舍《茶馆》：微型晒场","author":"老舍《茶馆》","year":"1957（剧本发表）／1958（首演）","excerpt":"（阐释性概括）（阐释性概括）茶馆里各色人等聚集，闲话、恩怨、消息全部在此摊开，如同谷物摊在晒场。","point":"室内公共空间的晒场变体：社会百态在茶馆这一“微型晒场”中被展演。","tag":"现代（1949—1979）","img":"assets/img/场-33.jpg","cut":"assets/tint/场-33.webp","ar":1.0,"px":132,"cutc":"assets/cutc/场-33.webp"},{"id":"场-34","cat":"场","title":"老舍《骆驼祥子》：大杂院的空地","author":"老舍《骆驼祥子》","year":"1936","excerpt":"（情节概述）（情节概述）大杂院空地上摊开粮食、杂物晾晒，底层劳动者的生计暴露在众人目光之下。","point":"城市贫民大杂院空地是都市微型晒场：底层生存被公开晾晒。","tag":"近代（1840—1949）","img":"assets/img/场-34.jpg","cut":"assets/tint/场-34.webp","ar":0.812,"px":132,"cutc":"assets/cutc/场-34.webp"},{"id":"场-35","cat":"场","title":"卡夫卡《变形记》：封闭房间的反向晒场","author":"弗兰兹·卡夫卡《变形记》","year":"1915","excerpt":"（情节概述）（情节概述）格里高尔被困在狭小房间，家人、房客不断从门外向内窥视，他的异化身体在封闭空间中被持续审视。","point":"密闭室内反向晒场：封闭空间里身体被持续观看，是晒场“公开审视”逻辑的室内变体。","tag":"近代（1840—1949）","img":"assets/img/场-35.jpg","cut":"assets/tint/场-35.webp","ar":0.6,"px":120,"cutc":"assets/cutc/场-35.webp"},{"id":"场-36","cat":"场","title":"夏洛蒂·勃朗特《简·爱》：干草场与庄园","author":"夏洛蒂·勃朗特《简·爱》","year":"1847","excerpt":"（场景整合）（场景整合）庄园外围干草场上，成堆干草铺开在日光之下，是乡村劳作的露天场地，与庄园内部密闭的情感秘密形成对照。","point":"庄园干草晒场作为外部开放空间，与桑菲尔德内部压抑密闭的秘密空间互为镜像。","tag":"近代（1840—1949）","img":"assets/img/场-36.jpg","cut":"assets/tint/场-36.webp","ar":1.3,"px":156,"cutc":"assets/cutc/场-36.webp"},{"id":"场-37","cat":"场","title":"帕斯捷尔纳克《日瓦戈医生》：雪地的冷晾晒","author":"鲍里斯·帕斯捷尔纳克《日瓦戈医生》","year":"1957（意大利文首版）","excerpt":"（情节概述）（情节概述）风雪抹平旷野，人体僵冻于无垠雪地，洁白冷光将死亡赤裸裸摊开在天地之间。","point":"雪地替代日光晒场，形成寒冷、死寂的终极晾晒：生命消逝的超验空间。","tag":"现代（1949—1979）","img":"assets/img/场-37.jpg","cut":"assets/tint/场-37.webp","ar":1.299,"px":168,"cutc":"assets/cutc/场-37.webp"},{"id":"场-38","cat":"场","title":"余华《活着》：金色乡土上的死亡","author":"余华《活着》","year":"1992","excerpt":"（阐释性概括）（阐释性概括）田间开阔空地承载乡民劳作与集会，也坦然承接猝然降临的死亡，金色乡土底色衬出生命陨落的悲凉。","point":"晒场兼具丰收生机与死亡终结属性：金色劳作空间成为死亡的反讽性场域。","tag":"当代（1980—2009）","img":"assets/img/场-38.jpg","cut":"assets/tint/场-38.webp","ar":0.794,"px":144,"cutc":"assets/cutc/场-38.webp"},{"id":"场-40","cat":"场","title":"沈从文《边城》：河滩晒网","author":"沈从文《边城》","year":"1934","excerpt":"（场景整合）（场景整合）河滩平坦，渔人将渔网铺开在石头上晾晒，河水、日光、渔网构成水边的晾晒空间。","point":"河滩作为水边晒场变体：劳作器物在日光下摊开，承载水乡日常的宁静秩序。","tag":"近代（1840—1949）","img":"assets/img/场-40.jpg","cut":"assets/tint/场-40.webp","ar":0.878,"px":144,"cutc":"assets/cutc/场-40.webp"},{"id":"场-41","cat":"场","title":"刘亮程《一个人的村庄》：风之晒场","author":"刘亮程《一个人的村庄》","year":"1998","excerpt":"（阐释性概括）（阐释性概括）风把村庄的一切都摊开：整个村庄是一座风的晒场，万物在流动中被摊开、磨损、显露。","point":"风作为无形晾晒媒介：村庄万物在风的吹拂中被摊开、翻检、显露——晒场逻辑的自然哲学版。","tag":"当代（1980—2009）","img":"assets/img/场-41.jpg","cut":"assets/tint/场-41.webp","ar":0.65,"px":180,"cutc":"assets/cutc/场-41.webp"},{"id":"场-43","cat":"场","title":"北方农村麦收季节的公社大晒场上，集体翻晒小麦的劳动号子声","author":"农业社会学田野调查","year":"1978","excerpt":"","point":"晒场作为'真实性'的背书场景，草根叙事+农业背景=流量密码","tag":"现代（1949—1979）","img":"assets/img/场-43.jpg","cut":"assets/tint/场-43.webp","ar":1.103,"px":144,"cutc":"assets/cutc/场-43.webp"},{"id":"场-45","cat":"场","title":"农民们把作物码放在柏油马路的一侧，或一捆捆地摆放在道路中间，确保路过的车辆从上面碾压而过。这样做是违法的，既公然违背交通安全法规，又违背食品卫生法规。不过，在中国的农村地区，没有人去计较这种行为，","author":"彼得·海斯勒《寻路中国》","year":"2010","excerpt":"","point":"晒场的空间越界——从私人领地到公共道路，传统农业习惯与现代法规冲突","tag":"平台数字时代（2010—）","img":"assets/img/场-45.jpg","cut":"assets/tint/场-45.webp","ar":1.501,"px":168,"cutc":"assets/cutc/场-45.webp"},{"id":"场-46","cat":"场","title":"打谷场露天影院","author":"历史","year":"1950","excerpt":"","point":"重现当年打谷场放映电影场景，引发群体乡愁。","tag":"现代（1949—1979）","img":"assets/img/场-46.jpg","cut":"assets/tint/场-46.webp","ar":1.429,"px":132,"cutc":"assets/cutc/场-46.webp","imgfix":"assets/cutc/场-46.webp"},{"id":"场-48","cat":"场","title":"关中忙罢艺术节“麦田与晒场剧场”","author":"西安美术学院 / 户县石井街道石井村","year":"2021","excerpt":"","point":"夏收后将打谷场与麦田原地转化为无边界剧场，把关中农耕文化中的“忙坝（麦收间歇休憩）”升华为当代大地艺术与戏剧舞台。","tag":"平台数字时代（2010—）","img":"assets/img/场-48.jpg","cut":"assets/tint/场-48.webp","ar":1.44,"px":216,"cutc":"assets/cutc/场-48.webp"},{"id":"场-52","cat":"场","title":"贵州苗寨中由于地形逼仄，屋顶、悬空木栈道及崖壁边缘共同构成的立体晒场网络","author":"山地建筑人类学","year":"2020","excerpt":"","point":"晒场的旅游化与空间再发现，从生产空间转化为消费空间","tag":"平台数字时代（2010—）","img":"assets/img/场-52.jpg","cut":"assets/tint/场-52.webp","ar":1.334,"px":144,"cutc":"assets/cutc/场-52.webp"},{"id":"场-53","cat":"场","title":"晒场与粮食安全","author":"知乎/新闻","year":"2022","excerpt":"","point":"晒场的国家战略意义，从民间智慧到国家安全的微观环节","tag":"平台数字时代（2010—）","img":"assets/img/场-53.jpg","cut":"assets/tint/场-53.webp","ar":1.465,"px":180,"cutc":"assets/cutc/场-53.webp"},{"id":"场-55","cat":"场","title":"晒场改造民宿：工业遗产与农业空间的建筑商业化演变","author":"抖音/小红书","year":"2020","excerpt":"","point":"晒场的建筑遗产化与商业化，地面痕迹成为'历史层积'的设计元素","tag":"平台数字时代（2010—）","img":"assets/img/场-55.jpg","cut":"assets/tint/场-55.webp","ar":1.561,"px":144,"cutc":"assets/cutc/场-55.webp"},{"id":"场-56","cat":"场","title":"麦田收割晒场大秀","author":"ins","year":"2022","excerpt":"","point":"将整片麦田收割后平整出的晒场作为无边界T台，模特穿梭在木质栈道间。这种将高端时装置于日常农事晒场的做法","tag":"平台数字时代（2010—）","img":"assets/img/场-56.jpg","cut":"assets/tint/场-56.webp","ar":1.0,"px":232,"cutc":"assets/cutc/场-56.webp"},{"id":"场-57","cat":"场","title":"晒场的消失","author":"澎湃新闻","year":"2023","excerpt":"","point":"晒场作为正在消逝的文化景观，现代性对农业空间的最终驱逐","tag":"平台数字时代（2010—）","img":"assets/img/场-57.jpg","cut":"assets/tint/场-57.webp","ar":1.772,"px":144,"cutc":"assets/cutc/场-57.webp"},{"id":"场-59","cat":"场","title":"水族馆与动物园——反向类比：被围观的生物晒场","author":"东京阳光水族馆屋顶海狮池 环形视觉展演 动物脱离日常栖息环境，被安置于露天环形场地之中，其行为纳入四周观众的集体凝视，构成视觉维度的晒场。","year":"","excerpt":"","point":"动物在玻璃后被游客凝视：动物园是被活体曝晒的剧场","tag":"概念转译/跨媒介原型（无年代）","img":"assets/img/场-59.jpg","cut":"assets/tint/场-59.webp","ar":1.906,"px":168,"cutc":"assets/cutc/场-59.webp"},{"id":"场-61","cat":"场","title":"晒场即市场摊位——摊位阵列的经济学","author":"越南芹苴露天早市（航拍）","year":"","excerpt":"","point":"集市摊位沿场院排开：晒场是市场的空间原型","tag":"概念转译/跨媒介原型（无年代）","img":"assets/img/场-61.jpg","cut":"assets/tint/场-61.webp","ar":0.75,"px":144,"cutc":"assets/cutc/场-61.webp"},{"id":"场-62","cat":"场","title":"声音的晾晒——听觉转译：把声音摊开","author":"埃皮达鲁斯古剧场 听觉‑声音外放 依托露天开敞空间将表演者的声音向旷野释放，表演现场移交至公共视野，声音连同演出共同交由听众接收、评判。","year":"","excerpt":"","point":"声音装置里的循环片段：听觉也可以被'摊开晾晒'","tag":"概念转译/跨媒介原型（无年代）","img":"assets/img/场-62.jpg","cut":"assets/tint/场-62.webp","ar":0.8,"px":168,"cutc":"assets/cutc/场-62.webp"},{"id":"场-63","cat":"场","title":"操场与阅兵场——反向类比：身体的集体晒场","author":"天安门广场阅兵仪式 国家力量仪式展演 原本部署于军营的人员与装备，调度至城市露天中轴线有序列阵，国家力量以可视形态敞开呈现，接受审视，释放符号化的仪式威仪。","year":"","excerpt":"","point":"整齐方阵在操场上接受检阅：身体被政治性地摊开","tag":"概念转译/跨媒介原型（无年代）","img":"assets/img/场-63.jpg","cut":"assets/tint/场-63.webp","ar":1.392,"px":156,"cutc":"assets/cutc/场-63.webp"},{"id":"场-64","cat":"场","title":"晒场即银幕——投影面的原始形态","author":"美国66号公路 66 Drive‑In汽车露天影院 露天影像晾晒 封存于胶片内部的影像经由投影投射至露天银幕，光影叙事敞开于夜空之下，交付在场观众观看、评判。","year":"","excerpt":"","point":"白墙与地面的受光面：晒场是最早的电影银幕","tag":"概念转译/跨媒介原型（无年代）","img":"assets/img/场-64.jpg","cut":"assets/tint/场-64.webp","ar":0.835,"px":144,"cutc":"assets/cutc/场-64.webp"},{"id":"场-65","cat":"场","title":"分层竹架的立体晒场——反向类比：从平面到立体的晒","author":"云南景迈山分层竹架晒茶场 立体叠构晒场 依托竹制支架搭建多层晾晒平台，将摊置、日晒通风、检视筛选整套晒场机制在垂直方向复现，形成立体叠合的晾晒空间。","year":"","excerpt":"","point":"竹架把晾晒引向垂直方向：晒场不必只有地面一层","tag":"概念转译/跨媒介原型（无年代）","img":"assets/img/场-65.jpg","cut":"assets/tint/场-65.webp","ar":0.835,"px":144,"cutc":"assets/cutc/场-65.webp"},{"id":"场-66","cat":"场","title":"橱窗与展柜——反向类比：商品的精心晒场","author":"巴黎春天百货临街玻璃橱窗 商品室内晒场 商品从库房转移至玻璃围合的展示空间，射灯替代日光，透明玻璃构成晒场边界，面向城市路人完成展示、欲望投射与消费筛选。","year":"","excerpt":"","point":"商品在橱窗里被布光陈列：橱窗是消费的晒场","tag":"概念转译/跨媒介原型（无年代）","img":"assets/img/场-66.jpg","cut":"assets/tint/场-66.webp","ar":1.0,"px":156,"cutc":"assets/cutc/场-66.webp"},{"id":"场-67","cat":"场","title":"墓碑阵列——反向类比：垂直的晒场","author":"美国阿灵顿国家公墓墓碑阵列 记忆阵列晒场 逝者身份信息固化为墓碑，以规整阵列铺展于露天草坪；死亡与集体记忆置于公众凝视之下，完成纪念与记忆层面的筛选。","year":"","excerpt":"","point":"墓碑将名字高高立起：公墓是直立的晒场","tag":"概念转译/跨媒介原型（无年代）","img":"assets/img/场-67.jpg","cut":"assets/tint/场-67.webp","ar":0.835,"px":168,"cutc":"assets/cutc/场-67.webp"},{"id":"场-68","cat":"场","title":"晒场即画布——大地艺术的母题","author":"阿格妮丝·丹尼斯《麦田‑对抗》1982 晒场作为大地艺术画布 城市闲置露天场地直接充当艺术画布，农作物作为创作媒材，日光风雨共同参与作品生成；作品具备临时性，完成之后场地本体保留。","year":"","excerpt":"","point":"麦田怪圈与地景艺术：晒场是大地艺术的原始画布","tag":"概念转译/跨媒介原型（无年代）","img":"assets/img/场-68.jpg","cut":"assets/tint/场-68.webp","ar":0.835,"px":184,"cutc":"assets/cutc/场-68.webp"},{"id":"场-69","cat":"场","title":"晒场即排版网格——平面设计的基线","author":"瑞士国际主义版式网格系统","year":"","excerpt":"","point":"竹匾的阵列就是网格系统：Bauhaus 的隐形祖先","tag":"概念转译/跨媒介原型（无年代）","img":"assets/img/场-69.jpg","cut":"assets/tint/场-69.webp","ar":0.835,"px":156,"cutc":"assets/cutc/场-69.webp"},{"id":"场-70","cat":"场","title":"桌面与工作台——反向类比：劳动的微型晒场","author":"丹尼尔·斯波耶《陷阱绘画》Tableau‑Piège","year":"","excerpt":"","point":"桌面摊开全部工具与文件：工位是个人的晒场","tag":"概念转译/跨媒介原型（无年代）","img":"assets/img/场-70.jpg","cut":"assets/tint/场-70.webp","ar":1.003,"px":144,"cutc":"assets/cutc/场-70.webp"},{"id":"场-71","cat":"场","title":"晒场作为考古遗址——原创概念","author":"庞贝古城考古遗址","year":"2024","excerpt":"","point":"当下的农业劳动作为未来考古对象","tag":"概念转译/跨媒介原型（无年代）","img":"assets/img/场-71.jpg","cut":"assets/tint/场-71.webp","ar":1.0,"px":180,"cutc":"assets/cutc/场-71.webp"},{"id":"场-72","cat":"场","title":"晒场即档案柜——物件的平铺归档法","author":"电脑操作系统桌面","year":"","excerpt":"","point":"每件物品占一格：晒场是最原始的数据库界面","tag":"概念转译/跨媒介原型（无年代）","img":"assets/img/场-72.jpg","cut":"assets/tint/场-72.webp","ar":0.698,"px":168,"cutc":"assets/cutc/场-72.webp"},{"id":"场-73","cat":"场","title":"晒场作为时钟——原创概念","author":"英国巨石阵","year":"2024","excerpt":"","point":"将晒场的时间性转化为物理时钟","tag":"概念转译/跨媒介原型（无年代）","img":"assets/img/场-73.jpg","cut":"assets/tint/场-73.webp","ar":0.835,"px":180,"cutc":"assets/cutc/场-73.webp"},{"id":"物-01","cat":"物","title":"晒药场的草药铺满长条竹席，中药材的深浅褐色交织","author":"摄影《百草晾晒》/地方志影像档案","year":"2016","excerpt":"","point":"晒场作为宗教仪式的空间载体","tag":"平台数字时代（2010—）","img":"assets/img/物-01.jpg","cut":"assets/tint/物-01.webp","ar":1.432,"px":80,"cutc":"assets/cutc/物-01.webp"},{"id":"物-03","cat":"物","title":"《用废弃旧报纸和泥土混合制作的当代晒场观念艺术》","author":"观念艺术展品","year":"2023","excerpt":"","point":"晒场物质(干草垛)作为光线的载体","tag":"平台数字时代（2010—）","img":"assets/img/物-03.jpg","cut":"assets/tint/物-03.webp","ar":1.432,"px":46,"cutc":"assets/cutc/物-03.webp"},{"id":"物-04","cat":"物","title":"《《毛主席去安源》等宣传画张贴》","author":"文革宣传画","year":"1960","excerpt":"","point":"领袖像晒满街头巷尾：图像在公共空间被批量曝晒","tag":"现代（1949—1979）","img":"assets/img/物-04.jpg","cut":"assets/tint/物-04.webp","ar":1.432,"px":80,"cutc":"assets/cutc/物-04.webp"},{"id":"物-05","cat":"物","title":"《无题（你的墓碑）》等公共文字","author":"珍妮·霍尔泽","year":"1982","excerpt":"","point":"LED 滚动的格言：语言被晾晒在公共空间","tag":"当代（1980—2009）","img":"assets/img/物-05.jpg","cut":"assets/tint/物-05.webp","ar":1.432,"px":80,"cutc":"assets/cutc/物-05.webp"},{"id":"物-06","cat":"物","title":"《晒辣椒》","author":"陈永锵","year":"1990","excerpt":"","point":"晒场的色彩政治学——红色作为视觉暴力与丰收符号","tag":"当代（1980—2009）","img":"assets/img/物-06.jpg","cut":"assets/tint/物-06.webp","ar":1.432,"px":74,"cutc":"assets/cutc/物-06.webp"},{"id":"物-07","cat":"物","title":"《晒鱼干(摄影)》","author":"爱德华·柯蒂斯","year":"1910","excerpt":"","point":"跨文化的'晒'——鱼干晒场与谷物晒场的对照","tag":"近代（1840—1949）","img":"assets/img/物-07.jpg","cut":"assets/tint/物-07.webp","ar":1.432,"px":80,"cutc":"assets/cutc/物-07.webp"},{"id":"物-08","cat":"物","title":"《徽州晒霉习俗》","author":"徽州民居","year":"","excerpt":"","point":"梅雨季后搬出衣物书画：晒场是对抗潮湿的记忆保卫战","tag":"民俗/未标年代","img":"assets/img/物-08.jpg","cut":"assets/tint/物-08.webp","ar":1.432,"px":67,"cutc":"assets/cutc/物-08.webp"},{"id":"物-09","cat":"物","title":"《晒玉米》","author":"董其中","year":"1961","excerpt":"","point":"院墙作为晒场的垂直延伸","tag":"现代（1949—1979）","img":"assets/img/物-09.jpg","cut":"assets/tint/物-09.webp","ar":1.432,"px":96,"cutc":"assets/cutc/物-09.webp"},{"id":"物-10","cat":"物","title":"晒鱼","author":"赵声荣","year":"1963","excerpt":"","point":"晒场上摆满鱼的劳作场景","tag":"现代（1949—1979）","img":"assets/img/物-10.jpg","cut":"assets/tint/物-10.webp","ar":1.432,"px":74,"cutc":"assets/cutc/物-10.webp"},{"id":"物-11","cat":"物","title":"《晒场上成百上千个竹编圆匾呈蜂窝状整齐排列俯视图》","author":"无人机摄影《中国晒秋》","year":"2020","excerpt":"","point":"解放区木刻中的晒场，政治宣传与民间劳作结合","tag":"平台数字时代（2010—）","img":"assets/img/物-11.jpg","cut":"assets/tint/物-11.webp","ar":1.432,"px":96,"cutc":"assets/cutc/物-11.webp"},{"id":"物-12","cat":"物","title":"《晒鱼干》","author":"张照堂","year":"1970","excerpt":"","point":"海洋文化中的'晒'——鱼干晒场的视觉秩序","tag":"现代（1949—1979）","img":"assets/img/物-12.jpg","cut":"assets/tint/物-12.webp","ar":1.432,"px":74,"cutc":"assets/cutc/物-12.webp"},{"id":"物-13","cat":"物","title":"《晒场上晒着的数十张黄色烟叶在阳光下呈琥珀色透明》","author":"纪录摄影《烟叶之乡》","year":"2016","excerpt":"","point":"身体作为'谷物'——将晒场逻辑施加于人体","tag":"平台数字时代（2010—）","img":"assets/img/物-13.jpg","cut":"assets/tint/物-13.webp","ar":1.432,"px":46,"cutc":"assets/cutc/物-13.webp"},{"id":"物-14","cat":"物","title":"《集市地摊上的旧货》","author":"城乡集市","year":"","excerpt":"","point":"地摊上摊开的旧物：晒场是二手物的交换平面","tag":"民俗/未标年代","img":"assets/img/物-14.jpg","cut":"assets/tint/物-14.webp","ar":1.432,"px":88,"cutc":"assets/cutc/物-14.webp"},{"id":"物-15","cat":"物","title":"新疆红辣椒“戈壁红色海洋”，数万亩晒红辣椒场高饱和红色震撼全球社交媒体，被戏称为“大地铺红毯”。","author":"央视新闻短视频/TikTok","year":"2022","excerpt":"","point":"","tag":"平台数字时代（2010—）","img":"assets/img/物-15.jpg","cut":"assets/tint/物-15.webp","ar":0.749,"px":88,"cutc":"assets/cutc/物-15.webp"},{"id":"物-16","cat":"物","title":"晒秋柿子立体挂","author":"小红书/视觉中国","year":"2021","excerpt":"","point":"","tag":"平台数字时代（2010—）","img":"assets/img/物-16.jpg","cut":"assets/tint/物-16.webp","ar":1.639,"px":80,"cutc":"assets/cutc/物-16.webp"},{"id":"物-17","cat":"物","title":"舟山晒鱼干“海岸线银色长廊”","author":"乡村振兴案例研究","year":"2022","excerpt":"","point":"成千上万条剖开的鱼干在海岸线晒架上排开，极具震撼的工业化图腾风貌。","tag":"平台数字时代（2010—）","img":"assets/img/物-17.jpg","cut":"assets/tint/物-17.webp","ar":1.506,"px":96,"cutc":"assets/cutc/物-17.webp"},{"id":"物-18","cat":"物","title":"“阳光晒被子后的香味是死螨虫味吗”热议","author":"知乎/新浪微博","year":"2021","excerpt":"","point":"热议晒被子后“阳光味道”的化学成分，将温暖的晒场记忆解构为臭氧与微粒分解产物。","tag":"平台数字时代（2010—）","img":"assets/img/物-18.jpg","cut":"assets/tint/物-18.webp","ar":1.0,"px":74,"cutc":"assets/cutc/物-18.webp"},{"id":"物-20","cat":"物","title":"陕西“晒面皮/晒空心挂面”","author":"小红书/视觉中国","year":"2022","excerpt":"","point":"数米长细如发丝的空心挂面在木架上如白纱般垂挂，光线穿透面线呈现出如光纤般的半透明质感。","tag":"平台数字时代（2010—）","img":"assets/img/物-20.jpg","cut":"assets/tint/物-20.webp","ar":0.501,"px":80,"cutc":"assets/cutc/物-20.webp"},{"id":"物-21","cat":"物","title":"晒香膏/古法合香晾晒","author":"小红书","year":"2010","excerpt":"","point":"借温和日光进行“日晒熟成”","tag":"平台数字时代（2010—）","img":"assets/img/物-21.jpg","cut":"assets/tint/物-21.webp","ar":1.5,"px":67,"cutc":"assets/cutc/物-21.webp"},{"id":"物-22","cat":"物","title":"江苏海安地区传统手工蓝印花布染坊外长达百米的露天晒布场及师徒传承社会网络","author":"江苏非遗名录档案","year":"2016","excerpt":"","point":"晒场作为中老年消费者信任建构的场景，区别于城市直播间的人工感","tag":"平台数字时代（2010—）","img":"assets/img/物-22.jpg","cut":"assets/tint/物-22.webp","ar":1.501,"px":46,"cutc":"assets/cutc/物-22.webp"},{"id":"物-23","cat":"物","title":"四川“万缸晒酱场”浓郁红油酱香","author":"B站美食纪录片短视频","year":"2022","excerpt":"","point":"数千个酱缸在晒场上整齐排列，工人戴草帽翻晒蚕豆酱，红油在阳光下泛着光泽","tag":"平台数字时代（2010—）","img":"assets/img/物-23.jpg","cut":"assets/tint/物-23.webp","ar":1.5,"px":67,"cutc":"assets/cutc/物-23.webp"},{"id":"物-24","cat":"物","title":"晒被子","author":"知乎/公众号","year":"2023","excerpt":"","point":"公共空间","tag":"平台数字时代（2010—）","img":"assets/img/物-24.jpg","cut":"assets/tint/物-24.webp","ar":1.429,"px":80,"cutc":"assets/cutc/物-24.webp"},{"id":"物-25","cat":"物","title":"晾晒葡萄干西域奇观","author":"YouTube/小红书Vlog","year":"2022","excerpt":"","point":"利用土坯砌成透风蜂窝孔的荫房晒场，串串绿葡萄在暗处风干，展现干旱地区古老而高效的自然物理智慧","tag":"平台数字时代（2010—）","img":"assets/img/物-25.jpg","cut":"assets/tint/物-25.webp","ar":1.778,"px":88,"cutc":"assets/cutc/物-25.webp"},{"id":"物-26","cat":"物","title":"博物学家安娜·阿特金斯蓝晒法制作了世界上第一本摄影书《英国藻类植物：蓝晒法影像》","author":"历史","year":"1843","excerpt":"","point":"","tag":"近代（1840—1949）","img":"assets/img/物-26.jpg","cut":"assets/tint/物-26.webp","ar":1.5,"px":80,"cutc":"assets/cutc/物-26.webp"},{"id":"物-27","cat":"物","title":"新疆晒棉花","author":"TikTok/央视网","year":"2022","excerpt":"","point":"采棉机采摘后在晒场堆成连绵不绝的白色山脉，巨型打包机将其压制成规则的方块，打破传统手作晒场认知。","tag":"平台数字时代（2010—）","img":"assets/img/物-27.jpg","cut":"assets/tint/物-27.webp","ar":1.5,"px":67,"cutc":"assets/cutc/物-27.webp"},{"id":"物-28","cat":"物","title":"李子柒晒制萝卜干：晒场的食物人类学维度与东方生活方式的全球传播","author":"YouTube/抖音","year":"2021","excerpt":"","point":"晒场的食物人类学维度，李子柒的'晒'成为东方生活方式的全球符号","tag":"平台数字时代（2010—）","img":"assets/img/物-28.jpg","cut":"assets/tint/物-28.webp","ar":1.5,"px":74,"cutc":"assets/cutc/物-28.webp"},{"id":"物-29","cat":"物","title":"南意大利“红色大地”晒番茄","author":"Instagram/Dolce & Gabbana地中海大片/慢食协会（Slow Food）","year":"2022","excerpt":"","point":"在烈日与海风中暴晒8-10天，鲜红的番茄逐渐脱水凝缩成质感丰富的深红褶皱，构成极具视觉张力的大地阵列。","tag":"平台数字时代（2010—）","img":"assets/img/物-29.jpg","cut":"assets/tint/物-29.webp","ar":1.5,"px":96,"cutc":"assets/cutc/物-29.webp"},{"id":"物-30","cat":"物","title":"皖南古村落牌坊下，村民利用青石板地面进行传统晒霉菜的邻里互助社交","author":"皖南民俗文化志","year":"2019","excerpt":"","point":"晒场与消费主义批判的意外结合，农业'少即是多'的哲学","tag":"平台数字时代（2010—）","img":"assets/img/物-30.jpg","cut":"assets/tint/物-30.webp","ar":0.877,"px":80,"cutc":"assets/cutc/物-30.webp"},{"id":"物-31","cat":"物","title":"气味的晾晒——嗅觉转译：把味道摊开","author":"福建永春达埔晒香场 嗅觉‑香气弥散 香坯从室内加工区移至露天场地摊置，经由日光发生物质转化，香气向外弥散，嗅觉成为晒场向外传递的感知媒介。","year":"","excerpt":"","point":"晒场上的谷物香与霉味：气味是被空气传播的晒","tag":"概念转译/跨媒介原型（无年代）","img":"assets/img/物-31.jpg","cut":"assets/tint/物-31.webp","ar":0.835,"px":74,"cutc":"assets/cutc/物-31.webp"},{"id":"物-32","cat":"物","title":"晒场即筛网——分拣动作的机械化","author":"埃塞俄比亚咖啡网床晒场 筛网筛选原型 咖啡鲜果摊放在架空筛网之上，露天接受日晒通风，同步完成干燥、检视、剔除瑕疵果实，是晒场隐喻的物质原型。","year":"","excerpt":"","point":"扬谷的筛选动作：晒场是分类学的物理界面","tag":"概念转译/跨媒介原型（无年代）","img":"assets/img/物-32.jpg","cut":"assets/tint/物-32.webp","ar":1.07,"px":88,"cutc":"assets/cutc/物-32.webp"},{"id":"物-33","cat":"物","title":"蓝晒法（cyanotype）底片——反向类比：化学成像中的\"晒\"","author":"安娜·阿特金斯《不列颠藻类》蓝晒作品 光化学成像晾晒 植物标本铺放于感光纸之上，依托日光完成光化学反应生成影像；阳光既是成像媒介，亦是筛选物体轮廓的无形筛网。","year":"","excerpt":"","point":"相纸在紫外线下显影：摄影术本身就是一种晒","tag":"概念转译/跨媒介原型（无年代）","img":"assets/img/物-33.jpg","cut":"assets/tint/物-33.webp","ar":0.829,"px":56,"cutc":"assets/cutc/物-33.webp"},{"id":"物-34","cat":"物","title":"等待的晾晒——时间性转译：把等待摊开","author":"四川先市酱油晒露场 长时性晒场 酱醅长期置于露天酱缸，经历昼夜轮转与四季更迭，漫长时间与自然气候共同参与物质转化，时间成为晒场的作用介质。","year":"","excerpt":"","point":"农人在晒场边等待翻动时机：等待是被延长的晒","tag":"概念转译/跨媒介原型（无年代）","img":"assets/img/物-34.jpg","cut":"assets/tint/物-34.webp","ar":0.835,"px":88,"cutc":"assets/cutc/物-34.webp"},{"id":"物-35","cat":"物","title":"晾衣绳与衣物阵列——反向类比：最日常的晒场","author":"马灵丽《折射的合唱》","year":"","excerpt":"","point":"衣物在绳上随风摆动：晾衣绳是家庭的旗帜阵列","tag":"概念转译/跨媒介原型（无年代）","img":"assets/img/物-35.jpg","cut":"assets/tint/物-35.webp","ar":0.835,"px":74,"cutc":"assets/cutc/物-35.webp"},{"id":"物-36","cat":"物","title":"巴黎塞纳河畔旧书摊（Bouquinistes）","author":"巴黎塞纳河畔旧书摊（Bouquinistes）","year":"","excerpt":"","point":"","tag":"民俗/未标年代","img":"assets/img/物-36.jpg","cut":"assets/tint/物-36.webp","ar":0.613,"px":80,"cutc":"assets/cutc/物-36.webp"},{"id":"人-01","cat":"人","title":"《宫娥》","author":"迭戈·委拉斯开兹","year":"1656","excerpt":"","point":"多重镜面将公主与画家同时摊入画面：宫廷是最精致的封闭晒场","tag":"古代（史前—1840）","img":"assets/img/人-01.jpg","cut":"assets/tint/人-01.webp","ar":1.432,"px":96,"cutc":"assets/cutc/人-01.webp"},{"id":"人-02","cat":"人","title":"《《大家庭》系列》","author":"张晓刚","year":"1990","excerpt":"","point":"统一制服的家庭合影：集体肖像如晾晒的标准件","tag":"当代（1980—2009）","img":"assets/img/人-02.jpg","cut":"assets/tint/人-02.webp","ar":1.432,"px":94,"cutc":"assets/cutc/人-02.webp"},{"id":"人-03","cat":"人","title":"《收租院》","author":"四川美术学院《收租院》创作组","year":"1965","excerpt":"","point":"收租的场院与交租的人群：晒场是阶级清算的舞台","tag":"现代（1949—1979）","img":"assets/img/人-03.jpg","cut":"assets/tint/人-03.webp","ar":1.432,"px":90,"cutc":"assets/cutc/人-03.webp"},{"id":"人-04","cat":"人","title":"《公共澡堂 / 澡雪堂》","author":"北方洗浴文化","year":"","excerpt":"","point":"裸身共处的雾气空间：身体被热气'晾晒'的集体仪式","tag":"民俗/未标年代","img":"assets/img/人-04.jpg","cut":"assets/tint/人-04.webp","ar":1.432,"px":90,"cutc":"assets/cutc/人-04.webp"},{"id":"人-05","cat":"人","title":"捆卖束的农妇","author":"梵高","year":"1898","excerpt":"","point":"麦田之中人被劳作彻底吞没","tag":"近代（1840—1949）","img":"assets/img/人-05.jpg","cut":"assets/tint/人-05.webp","ar":1.432,"px":102,"cutc":"assets/cutc/人-05.webp"},{"id":"人-06","cat":"人","title":"晒场边缘，儿童在巨大的草垛旁嬉戏捉迷藏","author":"风俗油画《童年晒场》/当代乡土画家","year":"2012","excerpt":"","point":"全景式构图呈现晒场的社会生态学","tag":"平台数字时代（2010—）","img":"assets/img/人-06.jpg","cut":"assets/tint/人-06.webp","ar":1.432,"px":109,"cutc":"assets/cutc/人-06.webp"},{"id":"人-07","cat":"人","title":"《奥斯维辛集中营囚服编号》","author":"纳粹档案摄影","year":"1940","excerpt":"","point":"编号与瘦削面孔被逐一登记：档案照片是最冷酷的分类晒场","tag":"近代（1840—1949）","img":"assets/img/人-07.jpg","cut":"assets/tint/人-07.webp","ar":1.432,"px":109,"cutc":"assets/cutc/人-07.webp"},{"id":"人-08","cat":"人","title":"《晒谷场上》","author":"陈衍宁","year":"1972","excerpt":"","point":"晒场作为知青与农民共同劳动的乌托邦场景","tag":"现代（1949—1979）","img":"assets/img/人-08.jpg","cut":"assets/tint/人-08.webp","ar":1.432,"px":102,"cutc":"assets/cutc/人-08.webp"},{"id":"人-09","cat":"人","title":"《簸谷者》","author":"米勒","year":"1640","excerpt":"","point":"明暗法里的扬谷动作：光本身在分拣轻重","tag":"古代（史前—1840）","img":"assets/img/人-09.jpg","cut":"assets/tint/人-09.webp","ar":1.432,"px":96,"cutc":"assets/cutc/人-09.webp"},{"id":"人-10","cat":"人","title":"《泪水洒满丰收田》","author":"陈丹青","year":"1976","excerpt":"","point":"描绘乐西藏人民在晒谷场上劳作的场景","tag":"现代（1949—1979）","img":"assets/img/人-10.jpg","cut":"assets/tint/人-10.webp","ar":1.432,"px":96,"cutc":"assets/cutc/人-10.webp"},{"id":"人-11","cat":"人","title":"《阿尼埃尔的浴场》","author":"乔治·修拉","year":"1884","excerpt":"","point":"河岸晾晒身体的工人：晒场退化为一片沙滩","tag":"近代（1840—1949）","img":"assets/img/人-11.jpg","cut":"assets/tint/人-11.webp","ar":1.432,"px":109,"cutc":"assets/cutc/人-11.webp"},{"id":"人-12","cat":"人","title":"《南京大屠杀遇难者名单墙》","author":"侵华日军南京大屠杀遇难者纪念馆","year":"1985","excerpt":"","point":"密密麻麻的名字：纪念墙是苦难的集体晒场","tag":"当代（1980—2009）","img":"assets/img/人-12.jpg","cut":"assets/tint/人-12.webp","ar":1.432,"px":77,"cutc":"assets/cutc/人-12.webp"},{"id":"人-13","cat":"人","title":"《晒麦子的女人》","author":"朱尔斯·布雷顿","year":"1869","excerpt":"","point":"将晒场劳动审美化，农妇姿态接近古典雕塑","tag":"近代（1840—1949）","img":"assets/img/人-13.jpg","cut":"assets/tint/人-13.webp","ar":1.432,"px":90,"cutc":"assets/cutc/人-13.webp"},{"id":"人-14","cat":"人","title":"《减租会》","author":"古元","year":"1943","excerpt":"","point":"晒场从私人劳作空间转化为公共政治空间","tag":"近代（1840—1949）","img":"assets/img/人-14.jpg","cut":"assets/tint/人-14.webp","ar":1.432,"px":90,"cutc":"assets/cutc/人-14.webp"},{"id":"人-15","cat":"人","title":"《麦客》","author":"王宏剑","year":"1990","excerpt":"","point":"晒场作为流动劳动者的临时栖居地","tag":"当代（1980—2009）","img":"assets/img/人-15.jpg","cut":"assets/tint/人-15.webp","ar":1.432,"px":96,"cutc":"assets/cutc/人-15.webp"},{"id":"人-16","cat":"人","title":"《豆选》","author":"彦涵","year":"1948","excerpt":"","point":"晒场作为乡村民主仪式的发生地","tag":"近代（1840—1949）","img":"assets/img/人-16.jpg","cut":"assets/tint/人-16.webp","ar":1.432,"px":96,"cutc":"assets/cutc/人-16.webp"},{"id":"人-17","cat":"人","title":"《拾穗者》","author":"让-弗朗索瓦·米勒","year":"1857","excerpt":"","point":"晒场的'余韵'——收割后的拾穗是对晒场劳动的延续，黄昏光线赋予神圣感","tag":"近代（1840—1949）","img":"assets/img/人-17.jpg","cut":"assets/tint/人-17.webp","ar":1.432,"px":109,"cutc":"assets/cutc/人-17.webp"},{"id":"人-18","cat":"人","title":"《麦田里的播种者》","author":"文森特·梵高","year":"1888","excerpt":"","point":"红帽农夫行走在金色田野间播撒种子。播种象征希望与新生，也是梵高自我精神的投射：在荒芜大地上种下期盼。","tag":"近代（1840—1949）","img":"assets/img/人-18.jpg","cut":"assets/tint/人-18.webp","ar":1.432,"px":90,"cutc":"assets/cutc/人-18.webp"},{"id":"人-19","cat":"人","title":"《倒牛奶的女仆》","author":"约翰内斯·维米尔","year":"1658","excerpt":"","point":"晨光中倾倒的乳汁：厨房窗前的微型晒场","tag":"古代（史前—1840）","img":"assets/img/人-19.jpg","cut":"assets/tint/人-19.webp","ar":1.432,"px":109,"cutc":"assets/cutc/人-19.webp"},{"id":"人-20","cat":"人","title":"《麦田里的农妇》","author":"卡米耶·毕沙罗","year":"1881","excerpt":"","point":"印象派笔触捕捉晒场光影的瞬间变化","tag":"近代（1840—1949）","img":"assets/img/人-20.jpg","cut":"assets/tint/人-20.webp","ar":1.432,"px":109,"cutc":"assets/cutc/人-20.webp"},{"id":"人-22","cat":"人","title":"陈忠实《白鹿原》：祠堂场院的宗法审判","author":"陈忠实《白鹿原》","year":"1993","excerpt":"（情节概述）（情节概述）族人集会于祠堂前场院，白嘉轩等族老依族规当众惩戒违逆者，公开行刑立威，宗法秩序在全体乡民注视下确立。","point":"祠堂前露天场院是实体宗法晒场：族人、罪错、族规一同摊开，在众目睽睽下完成审判，确立乡土秩序。","tag":"当代（1980—2009）","img":"assets/img/人-22.jpg","cut":"assets/tint/人-22.webp","ar":1.303,"px":109,"cutc":"assets/cutc/人-22.webp"},{"id":"人-23","cat":"人","title":"雨果《巴黎圣母院》：耻辱柱上的卡西莫多","author":"维克多·雨果《巴黎圣母院》","year":"1831","excerpt":"（情节概述）（情节概述）群众从四面八方涌来，广场上人头攒动，卡西莫多被绑在耻辱柱上，在万众注视下承受鞭打与羞辱。","point":"城市广场作为刑罚晒场：罪人、痛苦与羞耻被摊开在公众目光之下接受晾晒与审判。","tag":"古代（史前—1840）","img":"assets/img/人-23.jpg","cut":"assets/tint/人-23.webp","ar":1.5,"px":102,"cutc":"assets/cutc/人-23.webp"},{"id":"人-24","cat":"人","title":"福柯《规训与惩罚》：公开刑罚的身体展演","author":"米歇尔·福柯《规训与惩罚》","year":"1975","excerpt":"（观点转述）（观点转述）公开酷刑并非法庭的附带产物，而是一种仪式：它在司法仪式中展示权力，让所有人看见“真理”。","point":"古代广场刑场是权力晒场：犯人的身体被摊开在公众目光之下，权力与真相在露天展演、接受所有人观看。","tag":"现代（1949—1979）","img":"assets/img/人-24.jpg","cut":"assets/tint/人-24.webp","ar":1.298,"px":90,"cutc":"assets/cutc/人-24.webp"},{"id":"人-25","cat":"人","title":"加缪《局外人》：法庭上的默尔索","author":"阿尔贝·加缪《局外人》（柳鸣九译）","year":"1942","excerpt":"（原文实录（柳鸣九译本））“可以说，人们好像是在把我完全撇开的情况下处理这桩案子。所有这一切都是在没有我参与的情况下进行的。我的命运由他们决定，而根本不征求我的意见。”","point":"法庭公开审判构成精神晒场：个体的生存状态被完全摊开，在公众目光下经受荒诞的审判。","tag":"近代（1840—1949）","img":"assets/img/人-25.jpg","cut":"assets/tint/人-25.webp","ar":1.5,"px":90,"cutc":"assets/cutc/人-25.webp"},{"id":"人-26","cat":"人","title":"鲁迅《阿Q正传》：人群注视下的精神胜利","author":"鲁迅《阿Q正传》","year":"1921—1922（连载于《晨报副刊》）","excerpt":"（原文实录）“阿Q被人揪住黄辫子，在壁上碰了四五个响头，闲人这才心满意足的得胜的走了，阿Q站了一刻，心里想，‘我总算被儿子打了，现在的世界真不像样……’于是也心满意足的得胜的走了。”","point":"乡村公共围观场域：屈辱在人群注视下上演，精神胜利法是弱者对“被晾晒”的心理自救。","tag":"近代（1840—1949）","img":"assets/img/人-26.jpg","cut":"assets/tint/人-26.webp","ar":1.295,"px":90,"cutc":"assets/cutc/人-26.webp"},{"id":"人-27","cat":"人","title":"韩少功《马桥词典》：晒坪上的闲话","author":"韩少功《马桥词典》","year":"1996","excerpt":"（场景整合）（场景整合）晒坪上摊着稻谷，马桥人的故事、秘闻、流言随翻谷的动作被不断翻起，传遍村子。","point":"乡村晒坪既是农事空间，也是语言晒场：乡土流言与集体记忆在此被反复晾晒传播。","tag":"当代（1980—2009）","img":"assets/img/人-27.jpg","cut":"assets/tint/人-27.webp","ar":1.297,"px":90,"cutc":"assets/cutc/人-27.webp"},{"id":"人-32","cat":"人","title":"密尔《论自由》：思想在辩驳中受检","author":"约翰·斯图亚特·密尔《论自由》","year":"1859","excerpt":"（原文实录（中译本））“即使公认的意见不仅是而且全部是真理，若不容它去接受猛烈而认真的挑战，那么它就会逐渐蜕化成一个教条。坚持它的人们并不能够深刻认识它的合理性。”","point":"公共讨论是思想的晒场：各类观念被摊开，在公开辩驳与光照下甄别真伪、淘汰谬误，让真理鲜活显现。","tag":"近代（1840—1949）","img":"assets/img/人-32.jpg","cut":"assets/tint/人-32.webp","ar":1.5,"px":102,"cutc":"assets/cutc/人-32.webp"},{"id":"人-33","cat":"人","title":"尼采《查拉图斯特拉如是说》：价值的晾晒（修正）","author":"弗里德里希·尼采《查拉图斯特拉如是说》","year":"1883—1885","excerpt":"（观点转述）（观点转述）查拉图斯特拉宣告：旧的价值必须被重估、碾碎，在日光之下重新称量，新的价值在光照中诞生。","point":"思想与价值如同谷物，在精神晒场上被摊开、曝晒：旧价值被晒碎，新价值在光照中诞生。","tag":"近代（1840—1949）","img":"assets/img/人-33.jpg","cut":"assets/tint/人-33.webp","ar":1.5,"px":102,"cutc":"assets/cutc/人-33.webp"},{"id":"人-34","cat":"人","title":"维特根斯坦《逻辑哲学论》：语言世界的敞开","author":"路德维希·维特根斯坦《逻辑哲学论》","year":"1921","excerpt":"（原文实录（中译本））“凡是可以说的东西都可以说得清楚；对于不能谈论的东西必须保持沉默。”","point":"清晰言说就是将事物摊开在语言的精神晒场：可被言说之物在语言光照下显明；不可言说之物则无法被置于公开检视场域。","tag":"近代（1840—1949）","img":"assets/img/人-34.jpg","cut":"assets/tint/人-34.webp","ar":1.5,"px":90,"cutc":"assets/cutc/人-34.webp","imgfix":"assets/cutc/人-34.webp"},{"id":"人-35","cat":"人","title":"萨特《禁闭》：他人即地狱（修正）","author":"让-保罗·萨特《禁闭》（Huis clos，又译《间隔》）","year":"1944","excerpt":"（原文实录（剧本台词））“你们的印象中，地狱里该有硫黄，有熊熊的火堆，有用来烙人的铁条……啊！真是天大的笑话！用不着铁条，他人就是地狱。”","point":"他人的注视构成无形晒场：当我被他人观看，我的存在被摊开、固化，在他者目光之下暴露、被评判。","tag":"概念转译/跨媒介原型（无年代）","img":"assets/img/人-35.jpg","cut":"assets/tint/人-35.webp","ar":1.296,"px":102,"cutc":"assets/cutc/人-35.webp"},{"id":"人-36","cat":"人","title":"海德格尔《存在与时间》：被抛的敞开之场","author":"马丁·海德格尔《存在与时间》","year":"1927","excerpt":"（观点转述）（观点转述）此在被抛入世界，在公开的世间之中展开自身，在敞开状态中显露本真与非本真。","point":"世间即是精神意义上的“晒场”：人被抛入敞开的公共场域，自身存在与可能性被摊开、显露，经受世界的光照。","tag":"近代（1840—1949）","img":"assets/img/人-36.jpg","cut":"assets/tint/人-36.webp","ar":1.299,"px":109,"cutc":"assets/cutc/人-36.webp"},{"id":"人-37","cat":"人","title":"普鲁斯特《追忆似水年华》：记忆的被唤醒与摊开","author":"马塞尔·普鲁斯特《追忆似水年华》","year":"1913—1927","excerpt":"（名段意译）（名段意译）当岁月流逝、人亡物毁，唯独气味和滋味长存：它们如同灵魂，在回忆的废墟上支撑起巨大的回忆大厦。","point":"回忆即精神晒场：尘封的记忆被感官唤醒而摊开，在意识的光照下被翻检，往事的真实与虚妄在此显露。","tag":"近代（1840—1949）","img":"assets/img/人-37.jpg","cut":"assets/tint/人-37.webp","ar":1.3,"px":96,"cutc":"assets/cutc/人-37.webp"},{"id":"人-38","cat":"人","title":"福柯《词与物》：知识型的公开晾晒","author":"米歇尔·福柯《词与物》（英译本名The Order of Things）","year":"1966","excerpt":"（观点转述）（观点转述）“知识型”是某一时期内把认识论、科学与纯思辨观念统一起来的关系整体。","point":"知识考古如同在精神晒场摊开不同时代的观念，在历史光照下检视知识的秩序、裂隙与更迭。","tag":"现代（1949—1979）","img":"assets/img/人-38.jpg","cut":"assets/tint/人-38.webp","ar":1.3,"px":109,"cutc":"assets/cutc/人-38.webp"},{"id":"人-39","cat":"人","title":"费孝通《乡土中国》：熟人社会的公共见证","author":"费孝通《乡土中国》（《乡土本色》）","year":"1948（初版；讲稿写于1947年前后）","excerpt":"（原文实录）“乡土社会的生活是富于地方性的。他们活动范围有地域上的限制，在区域间接触少，生活隔离，各自保持着孤立的社会圈子。”","point":"禾场、晒坪这类乡土晒场正是熟人社会的公共空间：个体言行、家事纠纷摊开在集体目光之下，被熟人共同体见证与评判。","tag":"近代（1840—1949）","img":"assets/img/人-39.jpg","cut":"assets/tint/人-39.webp","ar":1.297,"px":77,"cutc":"assets/cutc/人-39.webp"},{"id":"人-40","cat":"人","title":"曹雪芹《红楼梦》：白茫茫大地","author":"曹雪芹《红楼梦》（程高本第一百二十回收尾）","year":"清乾隆五十六年（1791）程甲本面世","excerpt":"（原文实录）“好一似食尽鸟投林，落了片白茫茫大地真干净。”","point":"大观园作为象征性精神晒场：人情悲欢、浮华荣辱尽数摊开展示，时光的光照剥去浮华，显露命运的本相。","tag":"古代（史前—1840）","img":"assets/img/人-40.jpg","cut":"assets/tint/人-40.webp","ar":1.858,"px":102,"cutc":"assets/cutc/人-40.webp"},{"id":"人-53","cat":"人","title":"晒场与乡村振兴","author":"央视/地方台","year":"2021","excerpt":"","point":"晒场作为政治宣传的视觉符号，国家话语中的'丰收美学'","tag":"平台数字时代（2010—）","img":"assets/img/人-53.jpg","cut":"assets/tint/人-53.webp","ar":0.793,"px":96,"cutc":"assets/cutc/人-53.webp"},{"id":"人-54","cat":"人","title":"晒mbti","author":"微博/小红书","year":"2023","excerpt":"","point":"","tag":"平台数字时代（2010—）","img":"assets/img/人-54.jpg","cut":"assets/tint/人-54.webp","ar":0.75,"px":90,"cutc":"assets/cutc/人-54.webp"},{"id":"人-56","cat":"人","title":"广西瑶族长鼓舞节庆期间，村民在村口大晒场上进行集体排练与狂欢","author":"少数民族非遗人类学","year":"2020","excerpt":"","point":"晒场作为宠物内容的天然布景，农业空间的娱乐化转型","tag":"平台数字时代（2010—）","img":"assets/img/人-56.jpg","cut":"assets/tint/人-56.webp","ar":0.667,"px":90,"cutc":"assets/cutc/人-56.webp"},{"id":"人-58","cat":"人","title":"晾晒作为审讯——权力转译：把晒理解为逼供","author":"雅典战神山（阿雷奥帕古斯）露天法庭 司法公开晾晒 涉案当事人、证词置于露天山岩平台，个体的言行被敞开于公民集体质询之下，经由公开辩论完成事实甄别与裁决。","year":"","excerpt":"","point":"将弱点摊在阳光下：晒场是逼供的空间原型","tag":"概念转译/跨媒介原型（无年代）","img":"assets/img/人-58.jpg","cut":"assets/tint/人-58.webp","ar":0.835,"px":102,"cutc":"assets/cutc/人-58.webp"},{"id":"人-60","cat":"人","title":"身体作为晒场——艺术作品","author":"Thomas Mailaender《Sunburns》晒伤系列","year":"","excerpt":"","point":"","tag":"概念转译/跨媒介原型（无年代）","img":"assets/img/人-60.jpg","cut":"assets/tint/人-60.webp","ar":0.835,"px":96,"cutc":"assets/cutc/人-60.webp"},{"id":"人-61","cat":"人","title":"Bernd Hagemann《Sleeping Chinese》沉睡的中国人","author":"Bernd Hagemann《Sleeping Chinese》沉睡的中国人","year":"","excerpt":"","point":"","tag":"民俗/未标年代","img":"assets/img/人-61.jpg","cut":"assets/tint/人-61.webp","ar":0.835,"px":96,"cutc":"assets/cutc/人-61.webp"}];
+const DARK = document.body.classList.contains('dark');
+const TIME_BG  = DARK ? ['#2A1E16','#33261C','#3D2D1F','#463422','#3A2A1E','#2E211A','#241A14']
+                      : ['#FFF3CF','#FFFDF7','#F9FCD9','#FFFFFF','#F1F7D8','#FFEFC4','#FFE1C2'];
+const TIME_OP  = DARK ? [0.50,0.42,0.34,0.28,0.36,0.44,0.52]
+                      : [0.40,0.30,0.22,0.10,0.20,0.32,0.46];
+</script>
+<script>
+(function(){
+"use strict";
+const CASES = DATA.filter(c=>c.cut);
+const clamp=(v,a,b)=>Math.min(Math.max(v,a),b);
+const lerp=(a,b,t)=>a+(b-a)*t;
+const board=document.getElementById('board');
+const scrollEl=document.getElementById('scroll');
+const objs=[];
+const CATMETA={
+  '场':{en:'FIELD',desc:'多元晒场场域：从乡土实体晒场，拓展到城市日常、社会公共、媒介、虚拟场域。'},
+  '物':{en:'OBJECT',desc:'被晾晒的客体：农耕物产、织物物料、私人旧物；是被曝晒、被观看的对象。'},
+  '人':{en:'PEOPLE',desc:'社群与隐喻主体：劳作社群、邻里社群、个体记忆；探讨暴露与遮蔽、记忆与公开。'}
+};
+
+/* ── 时间系统：24 小时钟表，指针入夜自动切换夜间模式 ── */
+let H=10.2, T=0.35, night=false;         /* H：0—24 小时；T：昼/夜各自的 0—1 进程 */
+function hourOf(){ return H; }
+function hexLerp(c1,c2,t){
+  const a=[1,3,5].map(i=>parseInt(c1.substr(i,2),16)), b=[1,3,5].map(i=>parseInt(c2.substr(i,2),16));
+  return '#'+a.map((v,i)=>Math.round(lerp(v,b[i],t)).toString(16).padStart(2,'0')).join('');
+}
+function timeAt(arr,t){
+  const x=t*(arr.length-1), i=Math.min(Math.floor(x),arr.length-2);
+  return typeof arr[0]==='number' ? lerp(arr[i],arr[i+1],x-i) : hexLerp(arr[i],arr[i+1],x-i);
+}
+function sunShadowAngle(){ return 160-140*T; }
+function sunShadowLen(){ return 6+13*(1-Math.sin(Math.PI*T)); }
+function setNight(n){
+  if(n===night) return;
+  night=n;
+  document.body.classList.toggle('night',n);
+}
+function applyTime(){
+  const hh=hourOf();
+  const isNight=(hh>=18||hh<6);
+  setNight(isNight);
+  T=isNight?((hh-18+24)%24)/12:(hh-6)/12;   /* 昼 6→18、夜 18→6 各自归一 */
+  const tint=document.getElementById('tint');
+  if(night){
+    const k=Math.sin(Math.PI*T);
+    tint.style.background=hexLerp('#3A2C20','#16120E',k);
+    tint.style.opacity=(0.5+0.32*k).toFixed(3);
+  }else{
+    tint.style.background=timeAt(TIME_BG,T);
+    tint.style.opacity=timeAt(TIME_OP,T);
+  }
+  /* 钟表指针：12 小时盘，H%12 定位；底部数字标注完整时段 */
+  const ang=((hh%12)/12)*360;
+  document.getElementById('clockhand').setAttribute('transform','rotate('+ang.toFixed(1)+' 60 60)');
+  const H2=Math.floor(hh), MM=Math.round((hh-H2)*60/10)*10;
+  document.getElementById('clock').textContent=(isNight?'☾ ':'☀ ')+String(H2).padStart(2,'0')+':'+String(MM>=60?50:MM).padStart(2,'0');
+  updateShadows();
+}
+/* ── 钟表盘：12 根刻度（双圈制：第1圈 0—12、第2圈 12—24） ── */
+(function buildClock(){
+  const g=document.getElementById('clockticks');
+  let h='';
+  for(let i=0;i<12;i++){
+    const a=(i/12)*Math.PI*2-Math.PI/2;
+    const big=i%3===0;
+    const r1=big?40:45, r2=52;
+    h+='<line class="tick'+(big?' big':'')+'" x1="'+(60+Math.cos(a)*r1).toFixed(1)+'" y1="'+(60+Math.sin(a)*r1).toFixed(1)+
+       '" x2="'+(60+Math.cos(a)*r2).toFixed(1)+'" y2="'+(60+Math.sin(a)*r2).toFixed(1)+'"/>';
+  }
+  g.innerHTML=h;
+})();
+let tDrag=false, clockLoop=0, prevA=null;
+const clockSvg=document.getElementById('clocksvg');
+function setT(e){
+  const r=clockSvg.getBoundingClientRect();
+  const x=(e.clientX-r.left)/r.width*120-60, y=(e.clientY-r.top)/r.height*120-60;
+  let a=Math.atan2(y,x)+Math.PI/2;            /* 顶部为 0 */
+  if(a<0) a+=Math.PI*2;
+  const ah=a/(Math.PI*2)*12;                  /* 0—12 */
+  if(prevA!=null){
+    if(prevA>10&&ah<2) clockLoop=(clockLoop+1)%2;        /* 顺时针越过 12：进一圈 */
+    else if(prevA<2&&ah>10) clockLoop=(clockLoop+1)%2;   /* 逆时针越过 12：退一圈 */
+  }
+  prevA=ah;
+  H=clamp(clockLoop*12+ah,0,23.99);
+  applyTime();
+}
+clockSvg.addEventListener('pointerdown',e=>{tDrag=true;prevA=null;clockSvg.setPointerCapture(e.pointerId);setT(e);});
+clockSvg.addEventListener('pointermove',e=>{if(tDrag)setT(e);});
+clockSvg.addEventListener('pointerup',()=>{tDrag=false;prevA=null;});
+
+/* ── 缩放：CSS zoom 真实缩放物件，滚轮恢复为页面滚动 ── */
+let Z=1;
+let zTimer=null;
+function setZ(z){
+  Z=clamp(z,0.45,1.8);
+  board.style.zoom=Z;
+  document.getElementById('zlab').textContent=Math.round(Z*100)+'%';
+  updateShadows();
+  reflowRopes();
+  clearTimeout(zTimer);            /* 缩放后按新有效宽度重排，画面始终铺满足迹 */
+  zTimer=setTimeout(()=>{ if(gathered){gathered=false;} layout(); },260);
+}
+document.getElementById('zin').addEventListener('click',()=>setZ(Z*1.12));
+document.getElementById('zout').addEventListener('click',()=>setZ(Z/1.12));
+addEventListener('wheel',e=>{
+  if(!e.ctrlKey&&!e.metaKey) return;
+  e.preventDefault();
+  setZ(Z*(e.deltaY<0?1.09:0.92));
+},{passive:false});
+
+/* ── 交错网格散布 + 谷堆堆积（显与藏）：列错位 + 随机抖动 + 实物比例 ── */
+let filter='all', gathered=false;
+const rnd=()=>Math.random();
+/* 晾晒高度：由内容推断，0.2=摊在地面 → 2.4=高挂；决定投影长度 */
+function dryHeight(cs){
+  const t=((cs.title||'')+(cs.point||'')+(cs.tag||''));
+  if(/(衣|布|织物|旗|挂|晾|毯|被|服|袍|裤|衫|帘|幔|袜|帕|纱|帐)/.test(t)) return 2.3;
+  if(cs.cat==='场') return 0.25;
+  if(cs.cat==='人') return 1.05;
+  if(/(谷|米|麦|豆|粟|稻|摊|椒|薯|果|菜|叶|茶|烟|盐|鱼|肉|饼|种)/.test(t)) return 0.35;
+  return 1.15;
+}
+function shadowK(cs){ return 0.30+0.85*(cs._hgt!=null?cs._hgt:1); }   /* 高度差拉大：贴地≈0.5，高挂≈2.4 */
+function flowPlace(){
+  const W=board.clientWidth;   /* zoom 下 clientWidth 即有效宽度，无需换算 */
+  const cols=clamp(Math.floor(W/240),3,7);
+  const colW=W/cols;
+  const colY=new Array(cols).fill(0);
+  for(let i=0;i<cols;i++) if(i%2===1) colY[i]=110+rnd()*70;   /* 偏移列错位 stagger */
+  const sorted=[...CASES].sort(()=>rnd()-0.5).sort((a,b)=>b.px-a.px);   /* 同类大小内随机 */
+  const out=[];
+  for(const cs of sorted){
+    let ci=0;
+    for(let i=1;i<cols;i++) if(colY[i]<colY[ci]) ci=i;
+    const h=clamp(cs.px,72,240);
+    const w=clamp(h*cs.ar,64,colW*0.9);
+    const x=ci*colW+(colW-w)/2+(rnd()*24-12);
+    const y=colY[ci];
+    out.push({cs,x:x,y:y,w:w,h:h});
+    colY[ci]=y+h+24+rnd()*36;
+  }
+  return {list:out,H:Math.max(...colY)+40};
+}
+/* 谷堆：初始加载保持克制——少量物件、小幅度松散堆叠，乱中有序 */
+function makePiles(list,H){
+  const W=board.clientWidth;
+  const nPiles=W>900?3:2;
+  const anchors=[];
+  for(let i=0;i<nPiles;i++){
+    anchors.push({x:W*(0.22+0.56*rnd()), y:H*(0.24+0.5*i/(nPiles-1||1))+60*rnd()});
+  }
+  /* 按面积小的优先入堆，比例收敛，避免初屏杂乱 */
+  const cand=list.filter(p=>p.w*p.h<240*200).sort(()=>rnd()-0.5);
+  const nIn=Math.floor(cand.length*0.2);
+  const inPile=new Set(cand.slice(0,nIn));
+  anchors.forEach((a,ai)=>{
+    const members=cand.slice(Math.floor(ai*nIn/nPiles),Math.floor((ai+1)*nIn/nPiles));
+    members.forEach((p,k)=>{
+      const ang=rnd()*Math.PI*2, rad=Math.pow(rnd(),0.5);
+      p.x=a.x+Math.cos(ang)*rad*95-p.w/2;
+      p.y=a.y+Math.sin(ang)*rad*46-p.h/2+rad*22;         /* 堆底略平 */
+      p.rot=(rnd()*16-8);
+      p.pile=true; p.z=20+k;
+    });
+  });
+  /* 没入堆的物件：若与堆区重叠则往下挪开 */
+  for(const p of list){
+    if(inPile.has(p)&&p.pile) continue;
+    for(const a of anchors){
+      const cx=p.x+p.w/2, cy=p.y+p.h/2;
+      const dx=(cx-a.x)/150, dy=(cy-a.y)/95;
+      if(dx*dx+dy*dy<1){ p.y=a.y+100+rnd()*30; }
+    }
+    p.rot=(rnd()*4-2);
+  }
+  return list;
+}
+function layout(){
+  gathered=false;
+  ropes.forEach(r=>{ r.el.remove(); r.xbtn.remove(); }); ropes.length=0;
+  /* 无边界画布：宽度超出视口，可左右拖拽探索 */
+  board.style.width=Math.max(innerWidth*1.45,1200)+'px';
+  const placed=flowPlace();
+  const list=placed.list;                      /* 初始状态：全部均匀平铺，不堆叠、不重叠 */
+  board.style.height=placed.H+'px';
+  board.innerHTML=''; objs.length=0;
+  /* 耙痕层：耙动轨迹画在这里，位于物件之下 */
+  const mk=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  mk.id='rakemarks';
+  mk.setAttribute('width',board.style.width); mk.setAttribute('height',placed.H);
+  board.appendChild(mk);
+  list.forEach(p=>{
+    const cs=p.cs;
+    cs._hgt=dryHeight(cs);
+    const el=document.createElement('div');
+    el.className='obj'+(p.pile?' pile':'');
+    el.dataset.id=cs.id;
+    el.style.cssText='left:'+p.x+'px;top:'+p.y+'px;width:'+p.w+'px;height:'+p.h+'px;';
+    el.style.setProperty('--rot',(p.rot||0).toFixed(1)+'deg');
+    if(p.z) el.style.zIndex=p.z;
+    el.setAttribute('tabindex','0'); el.setAttribute('role','button'); el.setAttribute('aria-label',cs.title);
+    el.innerHTML='<div class="inner">'+
+      '<div class="face front"><img src="'+cs.cut+'" alt="" draggable="false"></div>'+
+      '<div class="face back"><img src="'+(cs.cutc||cs.cut)+'" alt="" draggable="false"><span>'+cs.title.replace(/《|》/g,'')+(cs.year?' · '+cs.year:'')+'</span></div>'+
+      '</div>';
+    el._home={x:p.x,y:p.y};
+    el._pile=!!p.pile;
+    el._rot0=p.rot||0;
+    board.appendChild(el);
+    objs.push(el);
+    bindObj(el,cs);
+    applyDim(el);
+  });
+  updateShadows();
+}
+function applyDim(el){
+  const cs=CASES.find(c=>c.id===el.dataset.id);
+  let hide=false;
+  if(filter!=='all'&&cs.cat!==filter) hide=true;
+  if(!hide&&selTags.size) hide=!selTags.has(cs.tag);
+  el.classList.toggle('dim',hide);
+}
+let relayoutTimer=null;
+addEventListener('resize',()=>{clearTimeout(relayoutTimer);relayoutTimer=setTimeout(layout,220);});
+
+/* ── 光源与投影（限制在物体后方 180°，小活动范围） ── */
+let mx=innerWidth*0.7,my=innerHeight*0.25,raf=false;
+function boardRect(){ return board.getBoundingClientRect(); }
+function shadowVec(lx,ly,k){
+  const br=boardRect();
+  const mxl=(mx-br.left)/Z, myl=(my-br.top)/Z;
+  let ma=Math.atan2(ly-myl,lx-mxl)*180/Math.PI;
+  ma=((ma%360)+360)%360;
+  if(ma>180) ma-=360;
+  ma=clamp(ma,15,165);
+  const a=(sunShadowAngle()*0.72+ma*0.28)*Math.PI/180;
+  const len=sunShadowLen()*(k||1);          /* k：晾晒高度系数，挂得越高影子越长 */
+  return [Math.cos(a)*len,Math.sin(a)*len];
+}
+function updateShadows(){
+  raf=false;
+  document.documentElement.style.setProperty('--mx',mx+'px');
+  document.documentElement.style.setProperty('--my',my+'px');
+  if(night){
+    /* 夜间：无环境投影；仅在鼠标光源附近的物件有微弱投影，方向背离鼠标 */
+    const R=460;
+    for(const el of objs){
+      const rc=el.getBoundingClientRect();
+      if(!rc.width) continue;
+      const cx=rc.left+rc.width/2, cy=rc.top+rc.height/2;
+      const d=Math.hypot(cx-mx,cy-my);
+      if(d<R){
+        const f=1-d/R;
+        const len=f*f*9;
+        const a=Math.atan2(cy-my,cx-mx);
+        el.style.setProperty('--sx',(Math.cos(a)*len).toFixed(1)+'px');
+        el.style.setProperty('--sy',(Math.sin(a)*len).toFixed(1)+'px');
+        el.style.setProperty('--sh','rgba(12,8,5,'+(f*0.42).toFixed(2)+')');
+      }else{
+        el.style.setProperty('--sx','0px');
+        el.style.setProperty('--sy','0px');
+        el.style.setProperty('--sh','rgba(0,0,0,0)');
+      }
+    }
+    return;
+  }
+  for(const el of objs){
+    el.style.setProperty('--sh','');   /* 恢复 CSS 默认 --sh */
+    const w=parseFloat(el.style.width), h=parseFloat(el.style.height);
+    const x=parseFloat(el.style.left), y=parseFloat(el.style.top);
+    const [sx,sy]=shadowVec(x+w/2,y+h/2,el._cs?shadowK(el._cs):1);
+    el.style.setProperty('--sx',sx.toFixed(1)+'px');
+    el.style.setProperty('--sy',sy.toFixed(1)+'px');
+  }
+}
+addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  moveCur(e);
+  if(!raf){raf=true;requestAnimationFrame(updateShadows);}
+});
+scrollEl.addEventListener('scroll',()=>{reflowRopes();if(!raf){raf=true;requestAnimationFrame(updateShadows);}},{passive:true});
+
+/* ── 农具架 = 光标模式；通栏悬浮条悬浮伸出、点击工具后收回 ── */
+let tool='browse';
+const cur=document.getElementById('cur'), cursvg=document.getElementById('cursvg');
+const tagpanel=document.getElementById('tagpanel');
+const toolsEl=document.getElementById('tools');
+const toolstrip=document.getElementById('toolstrip');
+const hangcfg=document.getElementById('hangcfg');
+toolstrip.classList.add('att');
+setTimeout(()=>toolstrip.classList.remove('att'),6000);
+toolstrip.addEventListener('click',()=>{ toolsEl.classList.toggle('pin'); });
+document.getElementById('tooldock').addEventListener('mouseleave',()=>{ toolsEl.classList.remove('retract'); toolsEl.classList.remove('pin'); });
+const CURSVG={
+  rake:'<line x1="20" y1="2" x2="20" y2="23"/><path d="M7 27 q13-5 26 0"/><line x1="11" y1="27.4" x2="11" y2="37"/><line x1="16.6" y1="26.2" x2="16.6" y2="37"/><line x1="23.3" y1="26.2" x2="23.3" y2="37"/><line x1="29" y1="27.4" x2="29" y2="37"/>',
+  sieve:'<circle cx="20" cy="21" r="13"/><line x1="9" y1="16" x2="31" y2="16" stroke-width="1"/><line x1="7.5" y1="21" x2="32.5" y2="21" stroke-width="1"/><line x1="9" y1="26" x2="31" y2="26" stroke-width="1"/><line x1="14" y1="9.5" x2="14" y2="32.5" stroke-width="1"/><line x1="20" y1="8" x2="20" y2="34" stroke-width="1"/><line x1="26" y1="9.5" x2="26" y2="32.5" stroke-width="1"/>',
+  hang:'<path d="M4 11 C10 8 15 14 20 11 S30 8 36 11"/><path d="M20 11.6 v3.4"/><path d="M17.4 15.6 a2.8 2.8 0 1 0 5.2 0"/><rect x="14" y="19" width="12" height="14" stroke-width="1.4"/>',
+  gather:'<path d="M13 14 C13 5 27 5 27 14"/><path d="M8 14 L32 14 L28.5 35 L11.5 35 Z"/><path d="M10 20.5 q10 3 20 0" stroke-width="1"/><path d="M11 27 q9 2.5 18 0" stroke-width="1"/>'
+};
+function moveCur(e){
+  if(tool==='browse'||!CURSVG[tool]){ cur.classList.remove('on'); return; }
+  cur.classList.add('on');
+  cur.style.left=e.clientX+'px'; cur.style.top=e.clientY+'px';
+}
+function animObjs(fn){
+  objs.forEach(el=>el.classList.add('anim'));
+  fn();
+  setTimeout(()=>objs.forEach(el=>el.classList.remove('anim')),950);
+  setTimeout(updateShadows,60);
+  setTimeout(updateShadows,960);
+}
+/* 筛【整齐】：恢复主界面的整齐平铺 */
+function tidyAll(){
+  animObjs(()=>{
+    objs.forEach(el=>{
+      if(el.classList.contains('hung')) return;
+      el.style.left=el._home.x+'px'; el.style.top=el._home.y+'px';
+      el.style.setProperty('--rot',(el._rot0||0)+'deg');
+      el.style.zIndex=''; el._pile=false; el._pilePos=null; el._pushY=0; el.classList.remove('pile');
+    });
+  });
+}
+/* 耙【聚拢】：先把物件按场/物/人聚成三堆（堆在当前视口中央，观者看得见），再用耙痕梯度耙开 */
+let rakeDist=0;
+function rakePiles(){
+  rakeDist=0;
+  const vcx=scrollEl.scrollLeft+innerWidth/2/Z, vcy=scrollEl.scrollTop+innerHeight/2/Z;
+  /* 先数清各类数量：堆半径按各自数量归一化，三件大类再多堆也不会胀到相连 */
+  const totals={场:0,物:0,人:0};
+  objs.forEach(el=>{ if(!el.classList.contains('hung')) totals[el._cs.cat in totals?el._cs.cat:'物']++; });
+  const pileRx=150, pileRy=104;                    /* 单堆最大半径（归一化后恒定） */
+  const spreadY=Math.max(pileRy*2+90, Math.min(innerHeight*0.4,400)/Z);   /* 三堆竖排，中间留空不粘连 */
+  const centers={场:[vcx,vcy-spreadY],物:[vcx,vcy],人:[vcx,vcy+spreadY]};
+  const counts={场:0,物:0,人:0};
+  objs.forEach(el=>{
+    if(el.classList.contains('hung')) return;
+    const cat=el._cs.cat in centers?el._cs.cat:'物';
+    const i=counts[cat]++, tot=Math.max(totals[cat],1);
+    const a=i*2.399963+rnd()*0.5;                 /* 黄金角散布 */
+    const rr=Math.sqrt((i+0.5)/tot);              /* 0..1 归一化：堆大小恒定 */
+    const rx=pileRx*rr*(0.6+rnd()*0.4), ry=pileRy*rr*(0.6+rnd()*0.4);
+    el._pilePos={x:centers[cat][0]+Math.cos(a)*rx, y:centers[cat][1]+Math.sin(a)*ry, rot:rnd()*24-12};
+    el._rakeD=0;                                  /* 每堆各自的耙开进度：分别耙开 */
+    el._pushY=0;
+    el.classList.add('anim');
+    el.style.left=el._pilePos.x+'px'; el.style.top=el._pilePos.y+'px';
+    el.style.setProperty('--rot',el._pilePos.rot+'deg');
+    el.style.zIndex=20+i; el._pile=true; el.classList.add('pile');
+  });
+  setTimeout(()=>objs.forEach(el=>el.classList.remove('anim')),950);
+  setTimeout(updateShadows,60); setTimeout(updateShadows,960);
+}
+document.querySelectorAll('#tools .tool').forEach(b=>b.addEventListener('click',()=>{
+  const t=b.dataset.t;
+  toolsEl.classList.add('retract');                       /* 点击工具后工具架自动收回 */
+  /* 切换农具不再自动清除前一种效果：耙痕/挂绳/谷堆可自愿叠加；想清空用左下角扫把 */
+  if(t==='traybook'){ openTray(); return; }               /* 竹匾：进入手翻书界面，不改变画布工具 */
+  tool=t;
+  document.querySelectorAll('#tools .tool').forEach(x=>x.classList.toggle('on',x===b));
+  if(CURSVG[tool]){ document.body.classList.add('toolmode'); cursvg.innerHTML=CURSVG[tool]; }
+  else document.body.classList.remove('toolmode');        /* 翻找（铁锹）：恢复系统鼠标 */
+  tagpanel.classList.toggle('on',tool==='sieve');
+  hangcfg.classList.toggle('on',tool==='hang');
+  if(tool==='gather'){ toggleGather(); }
+  else if(tool==='sieve'){ if(!gathered) tidyAll(); }
+  else if(tool==='rake'){ if(gathered){ ungatherPiles(); } rakePiles(); }
+  /* 翻找（铁锹）：仅系统鼠标浏览弹卡，画布保持原状 */
+}));
+
+/* ── 扫把【清】：一扫把掉画布上全部农具效果（耙痕/三堆/挂绳/谷堆/展开的文字），回到初始平铺 ── */
+document.getElementById('clearfx').addEventListener('click',()=>{
+  const btn=document.getElementById('clearfx');
+  btn.classList.remove('sweep'); void btn.offsetWidth; btn.classList.add('sweep');
+  const mk=document.getElementById('rakemarks'); if(mk) mk.innerHTML='';      /* 耙痕 */
+  while(ropes.length) collapseRope(ropes[0]);                                 /* 挂绳（挂着的物件自动归位） */
+  if(gathered) ungatherPiles();                                               /* 谷堆粒子 */
+  if(document.body.classList.contains('reading')) closeReader();              /* 筛开的文字 */
+  tidyAll();                                                                  /* 三堆/位移全部回到初始平铺 */
+  setTimeout(updateShadows,80);
+});
+
+/* ── 筛选：年代标签多选，非选中物件变暗淡无色 ── */
+const selTags=new Set();
+const taglist=document.getElementById('taglist');
+const TAGS=[...new Set(CASES.map(c=>c.tag))];
+taglist.innerHTML=TAGS.map(t=>{
+  const n=CASES.filter(c=>c.tag===t).length;
+  return '<button class="tagopt" data-t="'+t+'"><span class="box"></span><span>'+t+'</span><span class="n">'+n+'</span></button>';
+}).join('');
+taglist.querySelectorAll('.tagopt').forEach(b=>b.addEventListener('click',()=>{
+  const t=b.dataset.t;
+  if(selTags.has(t)) selTags.delete(t); else selTags.add(t);
+  b.classList.toggle('on',selTags.has(t));
+  objs.forEach(applyDim);
+}));
+document.getElementById('tagclear').addEventListener('click',()=>{
+  selTags.clear();
+  taglist.querySelectorAll('.tagopt').forEach(b=>b.classList.remove('on'));
+  objs.forEach(applyDim);
+});
+
+/* ── 收：三分类谷堆（松散堆在画面中间）；收拢时耙/筛/挂不再作用 ── */
+/* ── 收拢（麻袋）：全部作品化作虚拟粒子谷堆——一颗粒子一件作品，晾晒高度高的在堆顶 ── */
+const pilecv=document.getElementById('pilecv');
+const piletip=document.getElementById('piletip');
+let pilePts=[], pileRAF=null, pileHover=null, pileCns=[];
+function avgColor(cs,cb){
+  if(cs._col){ cb(cs._col); return; }
+  const im=new Image();
+  im.onload=()=>{
+    try{
+      const off=document.createElement('canvas'); off.width=off.height=8;
+      const og=off.getContext('2d'); og.drawImage(im,0,0,8,8);
+      const d=og.getImageData(0,0,8,8).data;
+      let r=0,g=0,b=0,n=0;
+      for(let i=0;i<64;i++){ if(d[i*4+3]>120){ r+=d[i*4]; g+=d[i*4+1]; b+=d[i*4+2]; n++; } }
+      cs._col=n?('rgb('+(r/n|0)+','+(g/n|0)+','+(b/n|0)+')'):'#8A7F70';
+    }catch(e){ cs._col='#8A7F70'; }
+    cb(cs._col);
+  };
+  im.onerror=()=>{ cs._col='#8A7F70'; };
+  im.src=cs.cutc||cs.cut;
+}
+function toggleGather(){
+  if(gathered){ ungatherPiles(); return; }
+  gathered=true;
+  /* 挂绳上的物件全部取下、翻面的回到正面 */
+  ropes.forEach(r=>[...r.items].forEach(el=>unhang(el,true)));
+  objs.forEach(el=>el.classList.remove('flip'));
+  /* 一座谷堆：始终锚在画面中央（屏幕坐标系），粒子按晾晒高度分层——高挂在顶、贴地在下 */
+  pilePts=[];
+  const MOUND_H=340, MOUND_W=290;   /* 整体比例再大一点 */
+  const list=[];
+  for(const cs of CASES){
+    const el=objs.find(o=>o._cs===cs);
+    if(el&&el.classList.contains('dim')) continue;
+    list.push(cs);
+  }
+  const hgtOf=cs=>{
+    let h=(cs._hgt!=null?cs._hgt:dryHeight(cs));
+    if(h===1.15){   /* 推断不出的：按编号拟一个稳定的高度值（0.4–2.3m） */
+      let s=0; for(const ch of cs.id) s=(s*31+ch.charCodeAt(0))>>>0;
+      h=0.4+(s%190)/100;
+    }
+    return h;
+  };
+  list.sort((a,b)=>hgtOf(a)-hgtOf(b));
+  const n=list.length;
+  list.forEach((cs,i)=>{
+    const yfrac=(n>1? i/(n-1) : 0.5)*0.88+0.05+(rnd()*0.04-0.02);
+    const halfW=MOUND_W*Math.pow(1-yfrac,0.8)+8;
+    const xoff=(rnd()*2-1)*halfW;
+    pilePts.push({
+      cs:cs, cat:cs.cat,
+      ox:xoff, oy:-yfrac*MOUND_H+(rnd()*8-4),      /* 相对画面中央的偏移（board 单位） */
+      r:7.5+rnd()*4, ph:rnd()*Math.PI*2, col:null,
+      hgt:hgtOf(cs)
+    });
+    avgColor(cs,(c2)=>{ /* 颜色就绪后自然生效 */ });
+  });
+  document.body.classList.add('gathered');
+  pilecv.style.display='block';
+  const DPR=Math.min(2,devicePixelRatio||1);
+  pilecv.width=innerWidth*DPR; pilecv.height=innerHeight*DPR;
+  const g=pilecv.getContext('2d'); g.scale(DPR,DPR);
+  const CATCOL={'场':'#AE7962','物':'#C9A76B','人':'#CB9590'};
+  const t0=performance.now();
+  (function frame(){
+    if(!gathered) return;
+    const now=performance.now();
+    const mcx=innerWidth/2, mcy=innerHeight*0.56;   /* 谷堆始终在画面中央 */
+    g.clearRect(0,0,innerWidth,innerHeight);
+    const axCol=document.body.classList.contains('dark')?'rgba(242,227,182,.85)':'rgba(59,56,51,.8)';
+    /* 谷堆落地阴影，让堆体有落地感 */
+    g.globalAlpha=1; g.fillStyle='rgba(60,45,30,0.10)';
+    g.beginPath(); g.ellipse(mcx,mcy+10*Z,(MOUND_W+44)*Z,22*Z,0,0,6.2832); g.fill();
+    for(const p of pilePts){
+      const sx=mcx+p.ox*Z, sy=mcy+p.oy*Z;
+      p._sx=sx; p._sy=sy;
+      const breathe=0.82+0.18*Math.sin(now*0.002+p.ph);
+      g.globalAlpha=0.92*breathe;
+      g.fillStyle=p.cs._col||CATCOL[p.cat];
+      g.beginPath(); g.arc(sx,sy,(p._open?p.r+2:p.r)*Z,0,6.2832); g.fill();
+      if(p._open){   /* 已点开的粒子：略放大 + 描边环，与未点的区分开 */
+        g.globalAlpha=1; g.strokeStyle=axCol; g.lineWidth=2;
+        g.beginPath(); g.arc(sx,sy,(p.r+5.5)*Z,0,6.2832); g.stroke();
+      }
+    }
+    g.globalAlpha=1;
+    /* 已旋开的圆：逐帧跟随各自粒子，后点开的叠压在上面 */
+    for(const p of pileOpens){
+      if(!p._bub||p._sx==null) continue;
+      p._bub.style.left=p._sx+'px';
+      p._bub.style.top=p._sy+'px';
+    }
+    pileRAF=requestAnimationFrame(frame);
+  })();
+  updateShadows();
+}
+function ungatherPiles(){
+  gathered=false;
+  document.body.classList.remove('gathered');
+  pilecv.style.display='none';
+  piletip.style.display='none';
+  [...pileOpens].forEach(closePileBubble);
+  if(pileRAF){ cancelAnimationFrame(pileRAF); pileRAF=null; }
+  setTimeout(updateShadows,60);
+}
+/* 点按粒子：旋开一个圆（作品小圆窗），粒子描边与未点的区分开；多点几个，后开的叠压在上面 */
+let pileOpens=[], pileBubZ=60;
+function openPileBubble(p){
+  if(p._bub){ p._bub.style.zIndex=++pileBubZ; return; }   /* 已开的圆：再点置顶 */
+  const d=document.createElement('div');
+  d.className='pilebub';
+  d.style.zIndex=++pileBubZ;
+  d.innerHTML='<button class="pbx" title="收起">×</button><img src="'+p.cs.cut+'" alt=""><b>'+p.cs.title.replace(/《|》/g,'')+'</b><span>'+(p.cs.author||'')+(p.cs.year?' · '+p.cs.year:'')+' · 晾晒高度 '+p.hgt.toFixed(1)+'m</span><p>'+(p.cs.point||p.cs.excerpt||('「'+p.cs.cat+'」类档案 · '+(p.cs.tag||'')))+'</p>';
+  d.querySelector('.pbx').addEventListener('click',e=>{ e.stopPropagation(); closePileBubble(p); });
+  d.addEventListener('pointerdown',e=>e.stopPropagation());
+  d.addEventListener('click',e=>{ e.stopPropagation(); d.style.zIndex=++pileBubZ; });
+  document.body.appendChild(d);
+  p._bub=d; p._open=true;
+  pileOpens.push(p);
+}
+function closePileBubble(p){
+  if(p._bub){ p._bub.remove(); p._bub=null; }
+  p._open=false;
+  const i=pileOpens.indexOf(p); if(i>=0) pileOpens.splice(i,1);
+}
+/* 悬浮粒子：即时显示对应作品信息；点按粒子旋开作品圆窗 */
+let pileHot=null, pilePd=null;
+addEventListener('mousemove',e=>{
+  if(!gathered){ pileHot=null; return; }
+  let best=null,bd=1e9;
+  for(const p of pilePts){
+    if(p._sx==null) continue;
+    const d=Math.hypot(p._sx-e.clientX,p._sy-e.clientY);
+    const hit=Math.max(30,p.r*Z+16);          /* 每颗粒子都有够大的命中圈，不留死点 */
+    if(d<hit&&d<bd){ bd=d; best=p; }
+  }
+  pileHot=best;
+  if(best){
+    /* 悬浮只亮出晾晒高度数据；点按才展开具体内容 */
+    piletip.innerHTML='<b>'+best.cs.title.replace(/《|》/g,'')+'</b><span>晾晒高度 '+best.hgt.toFixed(1)+'m · 点按查看具体内容</span>';
+    piletip.style.display='block';
+    piletip.style.left=Math.min(e.clientX+16,innerWidth-300)+'px';
+    piletip.style.top=(e.clientY+16)+'px';
+  }else piletip.style.display='none';
+});
+addEventListener('pointerdown',e=>{ pilePd={x:e.clientX,y:e.clientY}; });
+addEventListener('click',e=>{
+  if(!gathered||!pileHot||!pilePd) return;
+  if(Math.hypot(e.clientX-pilePd.x,e.clientY-pilePd.y)>6) return;   /* 拖动画布不触发 */
+  if(e.target.closest('#piletip,.pilebub,#flipcard,.sheet,#tooldock,#hangcfg,header,#clockwrap')) return;
+  openPileBubble(pileHot);
+});
+
+/* ── 挂绳：配置面板自定数量与粗细（粗细区分组别），拖动素材吸附上绳 ── */
+const ropes=[];
+let ropeSeq=0, hcNum=2, hcTh=2;
+document.getElementById('hcminus').addEventListener('click',()=>{ hcNum=clamp(hcNum-1,1,5); document.getElementById('hcnum').textContent=hcNum; });
+document.getElementById('hcplus').addEventListener('click',()=>{ hcNum=clamp(hcNum+1,1,5); document.getElementById('hcnum').textContent=hcNum; });
+document.querySelectorAll('.hc-th button').forEach(b=>b.addEventListener('click',()=>{
+  hcTh=+b.dataset.th;
+  document.querySelectorAll('.hc-th button').forEach(x=>x.classList.toggle('on',x===b));
+}));
+document.getElementById('hcclose').addEventListener('click',()=>hangcfg.classList.remove('on'));
+document.getElementById('hcgen').addEventListener('click',()=>{
+  /* 新绳从视口最顶端依次往下加，间距随机不一致（真实晒场感）；挂绳区占位，画布物件顺势下移不藏到绳后 */
+  let addH=0;
+  for(let i=0;i<hcNum;i++){
+    createRope(hcTh);
+    addH+=ropeSlotH({th:hcTh})+50;
+  }
+  if(addH>0){
+    animObjs(()=>{
+      objs.forEach(el=>{
+        if(el.classList.contains('hung')) return;
+        el._home.y+=addH;
+        el.style.top=(parseFloat(el.style.top)+addH)+'px';
+      });
+    });
+    board.style.height=((parseFloat(board.style.height)||innerHeight)+addH)+'px';
+  }
+  reflowRopes();
+  hangcfg.classList.remove('on');   /* 选完自动收起；再点挂绳工具可重新打开 */
+});
+/* 绳槽高：必须盖住整条垂挂物件（带顶36 + 绳下12~22 + 物件最高151 + 下摆余量），否则物件下摆压到下方内容 */
+function ropeSlotH(rp){ return rp.th===1?216:rp.th===3?262:240; }
+/* 挂绳持续吸附在视口最顶端：滚动画布时跟随，不会看不见；且始终不与图像重叠 */
+function reflowRopes(){
+  let y=scrollEl.scrollTop/Z+86/Z;
+  for(const rp of ropes){
+    rp.y=y;
+    rp.el.style.top=(rp.y-36)+'px';
+    rp.xbtn.style.top=((rp.y-30)*Z-scrollEl.scrollTop)+'px';   /* 画布坐标×zoom−滚动 = 视口坐标 */
+    ropePlaceItems(rp);
+    y+=ropeSlotH(rp)+rp.gap;
+  }
+  repelFromRopes(ropes.length?y:-1e9);
+}
+/* 绳区（视口顶 → zoneB）内的图像顺势下推到绳区之下；离开绳区自动回原位 */
+function repelFromRopes(zoneB){
+  if(gathered) return;
+  const zoneT=scrollEl.scrollTop/Z;
+  for(const el of objs){
+    if(el.classList.contains('hung')||el._pilePos) continue;
+    const base=(parseFloat(el.style.top)-(el._pushY||0));
+    const h=parseFloat(el.style.height);
+    let need=0;
+    if(base<zoneB&&base+h>zoneT) need=zoneB+24-base;
+    if((el._pushY||0)!==need){
+      el._pushY=need;
+      el.style.top=(base+need)+'px';
+    }
+  }
+}
+function createRope(th){
+  const band=document.createElement('div');
+  band.className='ropeband th'+(th||2);
+  band.innerHTML='<div class="rl"></div><span class="rtag">挂绳 · '+(th===1?'细':th===3?'粗':'中')+'</span>';
+  /* 收起钮独立于绳带：置顶 z-index，挂在绳上/堆里的物件再多也压不住，随时可点掉 */
+  const xb=document.createElement('button');
+  xb.className='ropex2'; xb.title='收起这条挂绳'; xb.textContent='×';
+  const rp={id:++ropeSeq,y:0,el:band,xbtn:xb,items:[],th:th||2,gap:Math.round(10+rnd()*44)};
+  board.appendChild(band); document.body.appendChild(xb);   /* × 挂到 body：fixed 钉在视口右缘，不被画布置换 */
+  ropes.push(rp);
+  xb.addEventListener('click',e=>{ e.stopPropagation(); collapseRope(rp); });
+  reflowRopes();
+  return rp;
+}
+function collapseRope(rp){
+  [...rp.items].forEach(el=>unhang(el,false));
+  rp.el.remove(); rp.xbtn.remove();
+  ropes.splice(ropes.indexOf(rp),1);
+  reflowRopes();
+  setTimeout(updateShadows,60);
+}
+function ropePlaceItems(rp){
+  let x=46;
+  rp.items.forEach((el,i)=>{
+    el.style.left=x+'px';
+    el.style.top=(rp.y+12+[0,10,4][i%3])+'px';   /* 挂得离绳更近，高低轻微错落 */
+    x+=parseFloat(el.style.width)+34;
+  });
+}
+function nearestRope(cy){
+  let best=null,bd=1e9;
+  for(const rp of ropes){ const d=Math.abs(rp.y-cy); if(d<bd){bd=d;best=rp;} }
+  return best;
+}
+/* 拖动吸附：物件中心落在挂绳带附近 ±46px 内即吸附 */
+function snapRope(cy){
+  const rp=nearestRope(cy);
+  return (rp&&Math.abs(rp.y+30-cy)<80+rp.th*12)?rp:null;   /* 吸附更灵敏 */
+}
+function hang(el,cs,rp){
+  if(!rp) rp=nearestRope(parseFloat(el.style.top)+parseFloat(el.style.height)/2);
+  if(!rp) return;
+  /* 归一化尺寸：挂上绳的物件统一 118—151px 高，保持比例（挂上去看得清） */
+  const w0=parseFloat(el.style.width), h0=parseFloat(el.style.height);
+  if(!el._wh) el._wh={w:el.style.width,h:el.style.height};
+  const h2=118+((cs.id.charCodeAt(cs.id.length-1))%34);
+  const w2=h2*(w0/h0);
+  el.classList.remove('pile'); el._pile=false;
+  el.classList.add('hung');
+  el.style.width=w2+'px'; el.style.height=h2+'px';
+  el.style.setProperty('--rot','0deg');
+  el._rope=rp;
+  rp.items.push(el);
+  ropePlaceItems(rp);
+  cs._hgtSave=cs._hgt; cs._hgt=2.45;               /* 挂高 → 长影 */
+  setTimeout(updateShadows,60);
+}
+function unhang(el,silent){
+  const rp=el._rope;
+  if(rp){ const i=rp.items.indexOf(el); if(i>=0) rp.items.splice(i,1); ropePlaceItems(rp); }
+  el._rope=null;
+  el.classList.remove('hung');
+  el.style.left=el._home.x+'px';
+  el.style.top=el._home.y+'px';
+  el._pushY=0;
+  if(el._wh){ el.style.width=el._wh.w; el.style.height=el._wh.h; el._wh=null; }
+  el.style.setProperty('--rot',(el._rot0||0)+'deg');
+  el.style.zIndex=el._pile?20:'';
+  if(el._cs&&el._cs._hgtSave!=null){ el._cs._hgt=el._cs._hgtSave; el._cs._hgtSave=null; }
+  if(!silent) setTimeout(updateShadows,60);
+}
+
+/* ── 物件交互：翻找拖动 / 耙规整 / 筛读档案 / 挂 / 收 ── */
+let zTop=40;
+function bindObj(el,cs){
+  let st=null;
+  el._cs=cs;
+  const img=el.querySelector('.face.front img');
+  el.addEventListener('pointerenter',()=>{
+    if((tool==='rake'||tool==='sieve')&&cs.cutc) img.src=cs.cutc;   /* 耙/筛：悬浮还原色彩，移开恢复 */
+  });
+  el.addEventListener('pointerleave',()=>{
+    if(el._revealed) return;                       /* 被耙复原过的保持原彩 */
+    if(img.getAttribute('src')!==cs.cut) img.src=cs.cut;
+  });
+  el.addEventListener('pointerdown',e=>{
+    if(tool==='rake') return;                    /* 耙：推移由全局耙逻辑接管 */
+    if(el.classList.contains('hung')) return;    /* 绳上的物件：点按即取下 */
+    el.setPointerCapture(e.pointerId);
+    st={px:e.clientX,py:e.clientY,ox:parseFloat(el.style.left),oy:parseFloat(el.style.top),moved:false};
+    el.classList.add('drag'); el.classList.add('pressed'); el.style.zIndex=++zTop;
+  });
+  el.addEventListener('pointermove',e=>{
+    if(!st) return;
+    const dx=(e.clientX-st.px)/Z, dy=(e.clientY-st.py)/Z;
+    if(!st.moved&&Math.hypot(e.clientX-st.px,e.clientY-st.py)<6) return;
+    st.moved=true;
+    el.style.left=(st.ox+dx)+'px';
+    el.style.top=(st.oy+dy)+'px';
+  });
+  el.addEventListener('pointerup',()=>{
+    if(el.classList.contains('hung')){ unhang(el,false); return; }
+    if(!st) return;
+    const moved=st.moved; st=null;
+    el.classList.remove('drag'); el.classList.remove('pressed');
+    if(!moved){
+      if(gathered) return;
+      if(tool==='hang') return;                  /* 挂：仅拖动吸附 */
+      if(tool==='sieve'){ burstOpen(el,cs); return; }
+      if(tool==='browse'){ openFlip(el,cs); return; }
+    }else{
+      if(tool==='hang'){
+        /* 拖动吸附：拖到挂绳附近即吸附悬挂 */
+        const cy=parseFloat(el.style.top)+parseFloat(el.style.height)/2;
+        const rp=snapRope(cy);
+        if(rp){ hang(el,cs,rp); updateShadows(); return; }
+      }
+      el._home={x:parseFloat(el.style.left),y:parseFloat(el.style.top)};
+      el._pushY=0;                                /* 用户拖动落点即为新基准，绳区下推量清零 */
+      if(el._pile){ el._pile=false; el.classList.remove('pile'); }
+    }
+    updateShadows();
+  });
+  el.addEventListener('keydown',e=>{
+    if(e.key==='Enter'&&!gathered){
+      if(tool==='sieve') burstOpen(el,cs);
+      else if(tool==='browse') openFlip(el,cs);
+    }
+  });
+}
+
+/* ── 耙子【爬】：真实耙地手感——鼠标方向直接决定扒开方向，物件实时跟随位移，
+   划过处复原原彩，画布上保留耙痕；不做任何自动归位 ── */
+let raking=false, rlx=0, rly=0, markPaths=null;
+function marksSvg(){ return document.getElementById('rakemarks'); }
+function beginMark(bx,by){
+  const svg=marksSvg(); if(!svg) return;
+  markPaths=[];
+  for(let k=-1;k<=1;k++){
+    const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d','M '+bx+' '+by);
+    p.setAttribute('stroke-width',k===0?5:2.5);
+    p._off=k*9;
+    svg.appendChild(p);
+    markPaths.push(p);
+  }
+  /* 只保留最近 70 组耙痕 */
+  while(svg.children.length>210) svg.removeChild(svg.firstChild);
+}
+function extendMark(bx,by,dx,dy){
+  if(!markPaths) return;
+  const len=Math.hypot(dx,dy)||1;
+  const nx=-dy/len, ny=dx/len;                 /* 垂直于拖动方向的齿距 */
+  for(const p of markPaths){
+    p.setAttribute('d',p.getAttribute('d')+' L '+(bx+nx*p._off).toFixed(1)+' '+(by+ny*p._off).toFixed(1));
+  }
+}
+scrollEl.addEventListener('pointerdown',e=>{
+  if(tool!=='rake'||gathered) return;
+  if(e.target.closest&&e.target.closest('.ropeband')) return;
+  raking=true; rlx=e.clientX; rly=e.clientY;
+  const br=board.getBoundingClientRect();
+  beginMark((e.clientX-br.left)/Z,(e.clientY-br.top)/Z);
+  scrollEl.setPointerCapture(e.pointerId);
+});
+scrollEl.addEventListener('pointermove',e=>{
+  if(!raking||tool!=='rake') return;
+  const dx=(e.clientX-rlx)/Z, dy=(e.clientY-rly)/Z;
+  rlx=e.clientX; rly=e.clientY;
+  const step=Math.hypot(dx,dy);
+  const br=board.getBoundingClientRect();
+  const bx=(e.clientX-br.left)/Z, by=(e.clientY-br.top)/Z;
+  const R=110, RACC=R*1.9;                            /* 进度累计半径大于推动半径 */
+  for(const el of objs){
+    if(el.classList.contains('dim')||el.classList.contains('hung')) continue;
+    const w=parseFloat(el.style.width), h=parseFloat(el.style.height);
+    const cx=parseFloat(el.style.left)+w/2, cy=parseFloat(el.style.top)+h/2;
+    const d=Math.hypot(cx-bx,cy-by);
+    if(el._pilePos){
+      if(d<RACC){
+        /* 分别耙开：耙子划过哪一堆，哪一堆才摊开；划得多摊得开 */
+        el._rakeD=(el._rakeD||0)+step;
+        const prog=clamp(el._rakeD/420,0,1);
+        const p=el._pilePos;
+        el.style.left=(p.x+(el._home.x-p.x)*prog)+'px';
+        el.style.top=(p.y+(el._home.y-p.y)*prog)+'px';
+        el.style.setProperty('--rot',(p.rot*(1-prog)+(el._rot0||0)*prog).toFixed(2)+'deg');
+        if(prog>=0.98){ el._pilePos=null; el._pile=false; el.classList.remove('pile'); el.style.zIndex=''; }
+      }
+    }else if(d<R){
+      /* 已摊开的物件：半径内跟随手劲轻微位移，保留真实耙地手感 */
+      const f=(1-d/R); const ff=f*f;
+      el.style.left=(parseFloat(el.style.left)+dx*ff*0.12)+'px';
+      el.style.top=(parseFloat(el.style.top)+dy*ff*0.12)+'px';
+    }
+    if(d<R){
+      /* 耙过复原原彩 */
+      if(!el._revealed&&el._cs.cutc){
+        el._revealed=true;
+        el.querySelector('.face.front img').src=el._cs.cutc;
+      }
+    }
+  }
+  extendMark(bx,by,dx,dy);
+  if(!raf){raf=true;requestAnimationFrame(updateShadows);}
+});
+addEventListener('pointerup',()=>{
+  if(raking){ raking=false; markPaths=null; updateShadows(); }   /* _home 保持不变：梯度插值的终点锚 */
+});
+
+/* ── 筛 / 翻找点按：物件化作颗粒散开 → 打字机档案落在水泥地上 ── */
+let readingEl=null;
+function burstOpen(el,cs){
+  const cv=document.getElementById('burst'), g=cv.getContext('2d');
+  const DPR=Math.min(2,devicePixelRatio||1);
+  cv.width=innerWidth*DPR; cv.height=innerHeight*DPR; g.scale(DPR,DPR);
+  const r=el.getBoundingClientRect();
+  /* 从抠图轮廓上取样：粒子严格生成在素材自身的原始位置（含颜色与坐标） */
+  const cols=[], spots=[];
+  try{
+    const off=document.createElement('canvas');
+    off.width=64; off.height=64;
+    const og=off.getContext('2d');
+    og.drawImage(imgElOf(el),0,0,64,64);
+    const d=og.getImageData(0,0,64,64).data;
+    for(let py=0;py<64;py++) for(let px=0;px<64;px++){
+      const a=d[(py*64+px)*4+3];
+      if(a>120){
+        spots.push([r.left+(px+0.5)/64*r.width, r.top+(py+0.5)/64*r.height]);
+        cols.push('rgb('+d[(py*64+px)*4]+','+d[(py*64+px)*4+1]+','+d[(py*64+px)*4+2]+')');
+      }
+    }
+  }catch(err){}
+  if(!cols.length){ cols.push('#8A867E','#3B3833','#B4642F'); spots.push([r.left+r.width/2,r.top+r.height/2]); }
+  const P=[];
+  const N=Math.min(300,Math.max(110,(r.width*r.height)/12|0));
+  for(let i=0;i<N;i++){
+    const si=(Math.random()*spots.length)|0;
+    const x=spots[si][0]+(Math.random()-0.5)*3, y=spots[si][1]+(Math.random()-0.5)*3;
+    P.push({x,y,vx:(Math.random()-0.5)*3,vy:-1-Math.random()*2.5,
+      s:1.2+Math.random()*2.2,c:cols[si],a:1});
+  }
+  el.classList.add('bursting');
+  readingEl=el;
+  const t0=performance.now();
+  (function frame(){
+    const t=(performance.now()-t0)/1000;
+    g.clearRect(0,0,innerWidth,innerHeight);
+    let alive=false;
+    for(const p of P){
+      p.vy+=0.16;                      /* 谷粒受重力下落 */
+      p.vx*=0.985;
+      p.x+=p.vx; p.y+=p.vy;
+      p.a=Math.max(0,1-t/0.9);
+      if(p.a>0) alive=true;
+      g.globalAlpha=p.a;
+      g.fillStyle=p.c;
+      g.beginPath(); g.arc(p.x,p.y,p.s,0,6.2832); g.fill();
+    }
+    g.globalAlpha=1;
+    if(alive&&t<1) requestAnimationFrame(frame);
+    else{
+      g.clearRect(0,0,innerWidth,innerHeight);
+      openReader(cs,r);
+      updateShadows();
+    }
+  })();
+}
+function imgElOf(el){ return el.querySelector('.face.front img'); }
+
+/* ── 阅读层：打字机逐字出现（速度匹配阅读节奏），文字带颜色 ── */
+const reader=document.getElementById('reader');
+let typeTimers=[];
+function clearType(){ typeTimers.forEach(clearTimeout); typeTimers=[]; }
+function typeInto(el,text,per){
+  return new Promise(res=>{
+    el.textContent='';
+    const cur=document.createElement('span'); cur.className='typecur';
+    let i=0;
+    (function step(){
+      el.textContent=text.slice(0,i);
+      el.appendChild(cur);
+      if(i>=text.length){ cur.remove(); res(); return; }
+      i++;
+      const ch=text[i-1]||'';
+      const pause=/[，。：；、！？—…]/.test(ch)?per*4:per;   /* 标点停顿，贴近阅读节奏 */
+      typeTimers.push(setTimeout(step,pause));
+    })();
+  });
+}
+async function openReader(cs,rect){
+  clearType();
+  const rp=document.getElementById('rplain');
+  rp.textContent='';
+  /* 抠图浮动在左侧，纯文本沿不规则轮廓环绕、顺势落在图形下方 */
+  const rcut=document.getElementById('rcut');
+  rcut.src=cs.cut;
+  rcut.style.setProperty('shape-outside','url("'+cs.cut+'")');
+  rcut.style.setProperty('-webkit-shape-outside','url("'+cs.cut+'")');
+  reader.classList.add('on'); syncModal();
+  document.body.classList.add('reading');
+  /* 阅读框锚定在抠图图像原位置（粒子从原位消散，文字落在原位） */
+  if(rect){
+    const bw=Math.min(460,innerWidth*0.88);
+    const bx=clamp(rect.left+rect.width/2-bw/2,14,innerWidth-bw-14);
+    const by=clamp(rect.top,64,innerHeight-320);
+    document.getElementById('readbox').style.left=bx+'px';
+    document.getElementById('readbox').style.top=by+'px';
+  }
+  /* 统一字号统一格式的一段纯文本（无标签、无多样式） */
+  let plain='';
+  plain+=(cs.title||'')+'　';
+  plain+=(cs.author||'')+(cs.year?'（'+cs.year+'）':'')+'。';
+  if(cs.point) plain+=cs.point;
+  if(cs.excerpt) plain+='　'+cs.excerpt;
+  await typeInto(rp,plain,38);
+}
+function closeReader(){
+  clearType();
+  reader.classList.remove('on'); syncModal();
+  document.body.classList.remove('reading');
+  if(readingEl){ readingEl.classList.remove('bursting'); readingEl=null; updateShadows(); }
+}
+reader.addEventListener('click',closeReader);
+document.getElementById('readbox').addEventListener('click',e=>e.stopPropagation());
+
+/* ── 画布探索：抓住空白处上下左右自由拖拽；中键在任意位置都可拖拽 ── */
+(function panLogic(){
+  let pan=null;
+  scrollEl.addEventListener('pointerdown',e=>{
+    if(tool==='rake') return;
+    const blank=(e.target===scrollEl||e.target===board);
+    if(!blank&&e.button!==1) return;         /* 左键需抓空白地面；中键随处可拖 */
+    e.preventDefault();
+    pan={x:e.clientX,y:e.clientY,st:scrollEl.scrollTop,sl:scrollEl.scrollLeft};
+    scrollEl.classList.add('panning');
+    scrollEl.setPointerCapture(e.pointerId);
+  });
+  scrollEl.addEventListener('pointermove',e=>{
+    if(!pan) return;
+    scrollEl.scrollTop=pan.st+(pan.y-e.clientY);
+    scrollEl.scrollLeft=pan.sl+(pan.x-e.clientX);
+  });
+  addEventListener('pointerup',()=>{pan=null;scrollEl.classList.remove('panning');});
+  scrollEl.addEventListener('auxclick',e=>{if(e.button===1)e.preventDefault();});
+})();
+
+/* ── 弹层状态（阅读层 / 信息弹层 / 翻卡片打开时恢复系统鼠标） ── */
+function syncModal(){
+  const anySheet=[...document.querySelectorAll('.sheet')].some(s=>s.classList.contains('on'));
+  document.body.classList.toggle('modal-open', reader.classList.contains('on')||anySheet||document.getElementById('flipcard').classList.contains('on')||document.getElementById('trayview').classList.contains('on'));
+}
+document.querySelectorAll('.sheet').forEach(sh=>{
+  sh.addEventListener('click',e=>{if(e.target===sh){e.currentTarget.classList.remove('on');syncModal();}});
+  sh.querySelector('.sheetclose').addEventListener('click',()=>{sh.classList.remove('on');syncModal();});
+});
+addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeReader();closeFlip();closeTray();document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('on'));syncModal();}
+});
+
+/* ── 分类视图（图三） ── */
+const catview=document.getElementById('catview');
+const raillist=document.getElementById('raillist');
+let catCur='场', idxCur=0;
+function openCat(cat){
+  catCur=cat; idxCur=0;
+  const list=CASES.filter(c=>c.cat===cat);
+  document.getElementById('railcat').textContent=cat;
+  document.getElementById('railen').textContent=CATMETA[cat].en;
+  /* 顶部不再展示大字：分类信息以小字呈现，红楼梦引文作为版块题记 */
+  document.getElementById('catlabel').textContent='档案 ARCHIVE · '+cat+' '+CATMETA[cat].en+' · '+list.length+' 条';
+  const hlm=CASES.find(c=>c.id==='人-40');
+  document.getElementById('catepi').innerHTML='<b>'+(hlm?hlm.title.replace(/《/g,'').replace(/》/g,'》'):'曹雪芹《红楼梦》')+'</b>　'+(hlm?hlm.point:'')+'<br><span style="color:var(--accent2)">'+CATMETA[cat].desc+'</span>';
+  document.getElementById('catcount').textContent=list.length+' 条档案 ENTRIES';
+  raillist.innerHTML=list.map((c,i)=>
+    '<button class="railitem" data-i="'+i+'" data-no="'+c.id.split('-')[1]+'">'+
+    '<img src="'+c.cut+'" loading="lazy" alt="">'+
+    '<span class="railpill">'+c.title.replace(/《/g,'').slice(0,12)+'</span></button>').join('');
+  raillist.querySelectorAll('.railitem').forEach(b=>b.addEventListener('click',()=>showEntry(+b.dataset.i)));
+  catview.classList.add('on');
+  scrollEl.style.display='none';
+  document.body.classList.add('incat');
+  showEntry(0);
+}
+function showEntry(i){
+  const list=CASES.filter(c=>c.cat===catCur);
+  idxCur=(i+list.length)%list.length;
+  const cs=list[idxCur];
+  raillist.querySelectorAll('.railitem').forEach((b,j)=>b.classList.toggle('on',j===idxCur));
+  const sel=raillist.querySelector('.railitem.on');
+  if(sel) sel.scrollIntoView({block:'nearest'});
+  document.getElementById('catimg').src=cs.imgfix||cs.img||cs.cutc;
+  document.getElementById('cfno').textContent=cs.id;
+  document.getElementById('cttitle').textContent=cs.title;
+  document.getElementById('ctmeta').textContent=(cs.author||'')+(cs.year?' · '+cs.year:'');
+  document.getElementById('ctcat').textContent=cs.cat;
+  document.getElementById('ctyear').textContent=cs.year||'—';
+  document.getElementById('ctauthor').textContent=cs.author||'—';
+  document.getElementById('cttag').textContent=cs.tag||'—';
+  document.getElementById('ctpoint').textContent=cs.point||'—';
+  document.getElementById('ctexcerpt').textContent=cs.excerpt||'';
+  document.getElementById('cidx').textContent=String(idxCur+1).padStart(2,'0')+' / '+String(list.length).padStart(2,'0');
+  const fig=document.getElementById('catfig');
+  const r=fig.getBoundingClientRect();
+  let fsx,fsy;
+  if(night){
+    const cx=r.left+r.width/2, cy=r.top+r.height/2;
+    const d=Math.hypot(cx-mx,cy-my);
+    if(d<460){
+      const f=1-d/460, len=f*f*9, va=Math.atan2(cy-my,cx-mx);
+      fsx=Math.cos(va)*len; fsy=Math.sin(va)*len;
+      fig.style.setProperty('--sh','rgba(12,8,5,'+(f*0.42).toFixed(2)+')');
+    }else{ fsx=0; fsy=0; fig.style.setProperty('--sh','rgba(0,0,0,0)'); }
+  }else{
+    let ma=Math.atan2((r.top+r.height/2)-my,(r.left+r.width/2)-mx)*180/Math.PI;
+    ma=((ma%360)+360)%360; if(ma>180) ma-=360;
+    ma=clamp(ma,15,165);
+    const va=(sunShadowAngle()*0.72+ma*0.28)*Math.PI/180;
+    const vl=sunShadowLen();
+    fsx=Math.cos(va)*vl; fsy=Math.sin(va)*vl;
+    fig.style.setProperty('--sh','');
+  }
+  fig.style.setProperty('--sx',fsx.toFixed(1)+'px');
+  fig.style.setProperty('--sy',fsy.toFixed(1)+'px');
+}
+/* 左栏悬停滚动：上方悬停向上滚，下方悬停向下滚 */
+let railDir=0;
+(function(){
+  const rail=document.getElementById('rail'), listEl=document.getElementById('raillist');
+  rail.addEventListener('mousemove',e=>{
+    const r=listEl.getBoundingClientRect();
+    const zone=110;
+    if(e.clientY<r.top+zone) railDir=-Math.min(1,(r.top+zone-e.clientY)/zone);
+    else if(e.clientY>r.bottom-zone) railDir=Math.min(1,(e.clientY-(r.bottom-zone))/zone);
+    else railDir=0;
+  });
+  rail.addEventListener('mouseleave',()=>{railDir=0;});
+  (function railTick(){
+    if(railDir) listEl.scrollTop+=railDir*9;
+    requestAnimationFrame(railTick);
+  })();
+})();
+document.getElementById('cprev').addEventListener('click',()=>showEntry(idxCur-1));
+document.getElementById('cnext').addEventListener('click',()=>showEntry(idxCur+1));
+function closeCat(){
+  catview.classList.remove('on');
+  scrollEl.style.display='';
+  document.body.classList.remove('incat');
+}
+document.getElementById('railback').addEventListener('click',closeCat);
+
+/* ── 页眉：分类弹窗 / 项目 / 菜单 ── */
+const sheetcat=document.getElementById('sheetcat');
+document.getElementById('btncat').addEventListener('click',()=>{
+  document.querySelector('#catopts .cnt-all').textContent=CASES.length;
+  document.querySelector('#catopts .cnt-场').textContent=CASES.filter(c=>c.cat==='场').length;
+  document.querySelector('#catopts .cnt-物').textContent=CASES.filter(c=>c.cat==='物').length;
+  document.querySelector('#catopts .cnt-人').textContent=CASES.filter(c=>c.cat==='人').length;
+  /* 图形化入口：全部=忙罢艺术节麻雀抠图；场=红楼梦相关抠图；物/人保留各自代表件 */
+  document.querySelectorAll('#catopts .catthumb').forEach(th=>{
+    if(th.dataset.done) return;
+    const c=th.dataset.c;
+    let rep=null;
+    if(c==='all') rep=CASES.find(x=>x.id==='场-48');          /* 关中忙罢艺术节的麻雀 */
+    else if(c==='场') rep=CASES.find(x=>x.id==='人-40');      /* 红楼梦：白茫茫大地 */
+    else rep=CASES.find(x=>x.cat===c);
+    th.innerHTML=rep?'<img src="'+rep.cut+'" '+(c==='all'?'style="max-width:100%" ':'')+'alt="">':'';
+    th.dataset.done=1;
+  });
+  sheetcat.classList.add('on'); syncModal();
+});
+document.querySelectorAll('#catopts button').forEach(b=>b.addEventListener('click',()=>{
+  filter=b.dataset.f;
+  sheetcat.classList.remove('on'); syncModal();
+  if(filter==='all'){closeCat();objs.forEach(applyDim);}
+  else openCat(filter);
+}));
+document.getElementById('btnproj').addEventListener('click',()=>{
+  document.getElementById('projcount').textContent=CASES.length+' 条 · 场 '+CASES.filter(c=>c.cat==='场').length+' / 物 '+CASES.filter(c=>c.cat==='物').length+' / 人 '+CASES.filter(c=>c.cat==='人').length;
+  document.getElementById('sheetproj').classList.add('on'); syncModal();
+});
+document.getElementById('btnmenu').addEventListener('click',()=>{document.getElementById('sheetmenu').classList.add('on');syncModal();});
+
+/* ── 翻（竹匾）：悬浮档案卡片，仅底部圆形竹匾执行翻动动画 ── */
+const flipcard=document.getElementById('flipcard');
+const fcpanel=document.getElementById('fcpanel');
+const fctraycard=document.getElementById('fctraycard');
+function openFlip(el,cs){
+  document.getElementById('fcimg').src=cs.img||cs.cutc||cs.cut;
+  document.getElementById('fctitle').textContent=cs.title;
+  document.getElementById('fcmeta').textContent=(cs.author||'')+(cs.year?' · '+cs.year:'')+' · '+cs.id;
+  document.getElementById('fcpoint').textContent=cs.point||'—';
+  document.getElementById('fcexc').textContent=cs.excerpt||'';
+  document.getElementById('fccat').textContent=cs.cat;
+  document.getElementById('fcyear').textContent=cs.year||'—';
+  document.getElementById('fcauthor').textContent=cs.author||'—';
+  document.getElementById('fctag').textContent=cs.tag||'—';
+  document.getElementById('fctrayimg').src=cs.cut;
+  document.getElementById('fctrayimg2').src=cs.cutc||cs.cut;
+  fctraycard.classList.remove('flip');
+  flipcard.classList.add('on');
+  fcpanel.classList.remove('open');
+  void fcpanel.offsetWidth;                       /* 重启动画 */
+  fcpanel.classList.add('open');                  /* 仅底部竹匾盘翻动入场，其余元素不动 */
+  setTimeout(()=>fcpanel.classList.remove('open'),900);
+  syncModal();
+}
+function closeFlip(){ flipcard.classList.remove('on'); syncModal(); }
+document.getElementById('fctray').addEventListener('click',e=>{ e.stopPropagation(); fctraycard.classList.toggle('flip'); });
+document.getElementById('fcclose').addEventListener('click',closeFlip);
+flipcard.addEventListener('click',e=>{ if(e.target===flipcard) closeFlip(); });
+
+/* ── 竹匾【手翻书】：独立界面，圆形竹匾正面抠图、背面隐喻文字，点击翻转 ── */
+const trayview=document.getElementById('trayview');
+const traycard=document.getElementById('traycard');
+let trayIdx=0;
+function openTray(){ trayIdx=0; showTray(); trayview.classList.add('on'); syncModal(); }
+function showTray(){
+  const cs=CASES[trayIdx];
+  document.getElementById('trayimg').src=cs.cut;
+  document.getElementById('traytext').textContent=cs.point||cs.title;
+  document.getElementById('trayidx').textContent=String(trayIdx+1).padStart(2,'0')+' / '+String(CASES.length).padStart(2,'0');
+  traycard.classList.remove('flip');
+}
+function closeTray(){ trayview.classList.remove('on'); syncModal(); }
+traycard.addEventListener('click',e=>{ e.stopPropagation(); traycard.classList.toggle('flip'); });
+document.getElementById('trayprev').addEventListener('click',e=>{ e.stopPropagation(); trayIdx=(trayIdx-1+CASES.length)%CASES.length; showTray(); });
+document.getElementById('traynext').addEventListener('click',e=>{ e.stopPropagation(); trayIdx=(trayIdx+1)%CASES.length; showTray(); });
+document.getElementById('trayrand').addEventListener('click',e=>{
+  e.stopPropagation();
+  let n; do{ n=Math.floor(rnd()*CASES.length); }while(n===trayIdx&&CASES.length>1);
+  trayIdx=n; showTray();
+  const tr=document.getElementById('tray');            /* 短促抖动：像手颠了一下竹匾 */
+  tr.classList.remove('shake'); void tr.offsetWidth; tr.classList.add('shake');
+});
+document.getElementById('trayclose').addEventListener('click',closeTray);
+trayview.addEventListener('click',e=>{ if(e.target===trayview) closeTray(); });
+
+layout();
+applyTime();
+setZ(1);
+})();
+</script>
+<script>
+/* ── 开屏：谷粒粒子聚成「晒场」→ 鼠标可拨散 → 风起吹散 → 直达档案 ── */
+(function(){
+const intro=document.getElementById('intro');
+if(!intro) return;
+const DARK=document.body.classList.contains('dark');
+const cv=document.getElementById('igrain'), ctx=cv.getContext('2d');
+const hint=document.getElementById('ihint');
+const DPR=Math.min(2,devicePixelRatio||1);
+const W=innerWidth,H=innerHeight;
+cv.width=W*DPR; cv.height=H*DPR; ctx.scale(DPR,DPR);
+
+/* 站点调色板：水泥底上的墨 / 陶土 / 谷粒 */
+const COLS = DARK ? ['#F2E3B6','#F2E3B6','#D9A05B','#C4692F','#B9A88A']
+                  : ['#3B3833','#3B3833','#3B3833','#B4642F','#C68B45','#8A7F70'];
+const BG = DARK ? '#2E211A' : '#E7DCBE';
+
+/* 文字目标点采样 */
+function sampleText(){
+  const off=document.createElement('canvas');
+  off.width=W; off.height=H;
+  const g=off.getContext('2d');
+  const cx=W/2, cy=H/2;
+  const fs=Math.min(W*0.17,H*0.32);          /* 字号收敛，不要过大 */
+  g.textAlign='center'; g.textBaseline='middle';
+  g.fillStyle='#000';
+  g.font='700 '+fs+'px "方正兰亭黑","兰亭黑 Pro","Microsoft YaHei",sans-serif';
+  g.fillText('晒场',cx,cy);                  /* 只保留中文标题 */
+  const img=g.getImageData(0,0,W,H).data;
+  const pts=[];
+  const step=Math.max(3,Math.round(W/460));
+  for(let y=0;y<H;y+=step)for(let x=0;x<W;x+=step)
+    if(img[(y*W+x)*4+3]>128) pts.push([x,y]);
+  /* 数量封顶，随机抽取 */
+  const MAX=4200;
+  if(pts.length>MAX){
+    const keep=[];
+    for(let i=0;i<MAX;i++) keep.push(pts[(Math.random()*pts.length)|0]);
+    return keep;
+  }
+  return pts;
+}
+
+const pts=sampleText();
+const N=pts.length;
+const P=[];
+for(let i=0;i<N;i++){
+  const a=Math.random()*Math.PI*2, r=Math.max(W,H)*(0.55+Math.random()*0.45);
+  P.push({
+    x:W/2+Math.cos(a)*r, y:H/2+Math.sin(a)*r,
+    vx:0, vy:0,
+    tx:pts[i][0], ty:pts[i][1],
+    sx:W/2+Math.cos(a)*r, sy:H/2+Math.sin(a)*r,
+    c:COLS[(Math.random()*COLS.length)|0],
+    s:1.6+Math.random()*2.0,               /* 方形谷粒边长 */
+    o:0.92+Math.random()*0.08,             /* 高不透明，干净硬朗 */
+    rot:Math.random()*Math.PI,             /* 方形随机转角 */
+    ph:Math.random()*Math.PI*2
+  });
+}
+
+let mx=-9999,my=-9999,lastMove=0;
+addEventListener('pointermove',e=>{mx=e.clientX;my=e.clientY;lastMove=performance.now();});
+addEventListener('pointerleave',()=>{mx=-9999;my=-9999;});
+
+let phase='form', phaseT=performance.now();
+function setPhase(ph){ phase=ph; phaseT=performance.now(); }
+document.getElementById('iskip').addEventListener('click',()=>{
+  if(phase==='form'||phase==='hold') setPhase('gust');
+});
+setTimeout(()=>{hint.style.opacity=0},3200);
+
+function easeOutCubic(t){return 1-Math.pow(1-t,3);}
+
+function tick(){
+  const now=performance.now();
+  const t=now-phaseT;
+  ctx.fillStyle=BG; ctx.fillRect(0,0,W,H);
+
+  let formK=1;
+  if(phase==='form') formK=easeOutCubic(Math.min(1,t/1500));
+  if(phase==='form'&&t>=1500){ setPhase('hold'); }
+  else if(phase==='hold'&&t>=700){ setPhase('gust'); }
+
+  const mouseLive=(now-lastMove)<2500;
+  for(const p of P){
+    if(phase==='gust'){
+      /* 风：向右的湍流，粒子失重飞散 */
+      p.vx+=(1.6+Math.random()*2.4);
+      p.vy+=-0.4+Math.sin(p.x*0.012+now*0.005)*0.7;
+      p.vx*=0.988; p.vy*=0.988;
+    }else{
+      /* 弹簧回目标位 */
+      const gx=phase==='form'?p.sx+(p.tx-p.sx)*formK:p.tx;
+      const gy=phase==='form'?p.sy+(p.ty-p.sy)*formK:p.ty;
+      const jx=phase==='hold'?Math.sin(now*0.004+p.ph)*0.8:0;
+      const jy=phase==='hold'?Math.cos(now*0.005+p.ph)*0.8:0;
+      const near=Math.hypot(p.x-mx,p.y-my)<170;
+      p.vx+=(gx+jx-p.x)*(near?0.045:0.085);
+      p.vy+=(gy+jy-p.y)*(near?0.045:0.085);
+      p.vx*=0.82; p.vy*=0.82;
+      /* 鼠标拨散 */
+      if(mouseLive){
+        const dx=p.x-mx, dy=p.y-my, d=Math.hypot(dx,dy);
+        if(d<150&&d>0.01){
+          const f=(1-d/150)*6.5;
+          p.vx+=dx/d*f; p.vy+=dy/d*f;
+        }
+      }
+    }
+    if(phase==='gust'){
+      p.x+=p.vx; p.y+=p.vy;
+    }else{
+      p.x+=p.vx; p.y+=p.vy;
+    }
+    ctx.fillStyle=p.c;
+    const shimmer=phase==='hold'?0.9+0.1*Math.sin(now*0.003+p.ph):1;   /* 聚形后微微呼吸 */
+    ctx.globalAlpha=p.o*shimmer;
+    /* 方形谷粒：干脆利落的硬边颗粒 */
+    ctx.save();
+    ctx.translate(p.x,p.y);
+    ctx.rotate(p.rot+(phase==='gust'?p.x*0.01:0));
+    ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s);
+    ctx.restore();
+  }
+  ctx.globalAlpha=1;
+
+  if(phase==='gust'&&t>=1250){
+    phase='done';
+    intro.style.transition='opacity .7s ease';
+    intro.style.opacity=0;
+    setTimeout(()=>{ intro.remove(); runLoader(()=>{ document.body.classList.remove('pre'); }); },700);
+    return;
+  }
+  if(phase!=='done') requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+
+/* 加载页：小鸟啄食谷物 */
+function runLoader(done){
+  const ld=document.getElementById('loader');
+  ld.classList.add('on');
+  const cv=document.getElementById('ldcv'), g=cv.getContext('2d');
+  const W2=innerWidth,H2=innerHeight,DPR2=Math.min(2,devicePixelRatio||1);
+  cv.width=W2*DPR2; cv.height=H2*DPR2; g.scale(DPR2,DPR2);
+  const GCOL2=['#D9A55C','#C68B45','#E0B36E','#B87A3A','#CE9A4E'];
+  const G=[];
+  const spanX=Math.min(W2*0.7,880), spanY=Math.min(H2*0.4,380);
+  for(let i=0;i<230;i++){
+    G.push({x:W2/2+(Math.random()-0.5)*spanX, y:H2*0.34+(Math.random()-0.5)*spanY,
+      rot:Math.random()*Math.PI, s:3+Math.random()*4, a:1, eating:false, done:false,
+      c:GCOL2[(Math.random()*GCOL2.length)|0]});
+  }
+  const bird=new Image(); bird.src='assets/tint/场-11.webp';
+  const birdPos={x:W2*0.18,y:H2*0.3};
+  let from={...birdPos}, target=null, hopK=1, mode='idle', peckT=0;
+  const t0=performance.now();
+  function pick(){
+    const left=G.filter(x=>!x.done&&x.a>0);
+    if(!left.length) return null;
+    let best=null,bd=1e9;
+    for(let i=0;i<6;i++){const c=left[(Math.random()*left.length)|0];const d=Math.hypot(c.x-birdPos.x,c.y-birdPos.y);if(d<bd){bd=d;best=c;}}
+    return best;
+  }
+  function frame(){
+    const el=(performance.now()-t0)/1000;
+    g.fillStyle='#F3EBD9'; g.fillRect(0,0,W2,H2);
+    for(const gr of G){
+      if(gr.eating){
+        gr.a=Math.max(0,gr.a-0.045);
+        if(gr.a===0) gr.done=true;
+      }
+      if(gr.a<=0) continue;
+      g.save(); g.globalAlpha=gr.a; g.translate(gr.x,gr.y); g.rotate(gr.rot);
+      g.fillStyle=gr.c; g.beginPath(); g.ellipse(0,0,gr.s,gr.s*0.55,0,0,Math.PI*2); g.fill();
+      g.restore();
+    }
+    if(mode==='idle'){ target=pick(); if(target){ from={...birdPos}; hopK=0; mode='hop'; } }
+    else if(mode==='hop'){
+      hopK+=0.055;
+      const k=Math.min(1,hopK), ee=k*(2-k);
+      birdPos.x=lerpN(from.x,target.x,ee);
+      birdPos.y=lerpN(from.y,target.y-12,ee)-Math.sin(k*Math.PI)*48;
+      if(k>=1){ mode='peck'; peckT=0; }
+    }
+    else if(mode==='peck'){
+      peckT+=1/60;
+      if(peckT>0.2&&!target.eating){
+        target.eating=true;
+        for(const gr of G) if(!gr.eating&&Math.hypot(gr.x-target.x,gr.y-target.y)<36) gr.eating=true;
+      }
+      if(peckT>0.55) mode='idle';
+    }
+    const bs=66;
+    const nod=mode==='peck'?Math.abs(Math.sin(peckT*Math.PI*3)):0;
+    g.save();
+    g.translate(birdPos.x,birdPos.y+nod*9);
+    g.rotate(nod*0.5+(mode==='hop'?-0.14:0.08));
+    if(bird.complete&&bird.naturalWidth) g.drawImage(bird,-bs/2,-bs*0.72,bs,bs);
+    g.restore();
+    if(el<1.2) requestAnimationFrame(frame);
+    else{
+      ld.classList.add('fade');
+      setTimeout(()=>{ ld.remove(); done(); },420);
+    }
+  }
+  requestAnimationFrame(frame);
+}
+function lerpN(a,b,t){return a+(b-a)*t;}
+})();
+</script>
+</body>
+</html>
